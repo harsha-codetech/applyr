@@ -1,0 +1,1417 @@
+{
+  "format": "applyr-packs",
+  "version": 1,
+  "updated": "2026-09-18",
+  "minExtensionVersion": "1.0.0",
+  "packs": [
+    {
+      "id": "lever",
+      "name": "Lever",
+      "match": [
+        "jobs.lever.co",
+        "lever.co",
+        "hire.lever.co"
+      ],
+      "verifiedAgainstLiveForm": "2026-09-18",
+      "detect": {
+        "any": [
+          "form.application-form",
+          "form[action*='lever.co']",
+          "div.application-form",
+          "input[name='urls[LinkedIn]']"
+        ]
+      },
+      "meta": {
+        "company": [
+          ".main-header-logo img[alt]",
+          ".posting-header .posting-categories",
+          "meta[property='og:site_name']"
+        ],
+        "role": [
+          ".posting-headline h2",
+          "h2.posting-headline",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [
+        "button[type='submit']",
+        ".template-btn-submit",
+        "#btn-submit"
+      ],
+      "confirm": [
+        ".confirmation-wrapper",
+        "[data-qa='confirmation']",
+        ".postings-confirmation"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": ".application-dropdown, [role='combobox']",
+          "option": "[role='option'], .dropdown-option"
+        }
+      },
+      "fields": [
+        {
+          "id": "full_name",
+          "selector": [
+            "input[name='name']",
+            "#name"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "input[name='email']",
+            "#email"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "input[name='phone']",
+            "#phone"
+          ]
+        },
+        {
+          "id": "current_company",
+          "selector": [
+            "input[name='org']",
+            "#org"
+          ]
+        },
+        {
+          "id": "full_address",
+          "selector": [
+            "input[name='location']",
+            "#location"
+          ]
+        },
+        {
+          "id": "pronouns",
+          "selector": [
+            "input[type='radio'][name='pronouns']",
+            "input[name='customPronounsOption']"
+          ]
+        },
+        {
+          "id": "linkedin_url",
+          "selector": [
+            "input[name='urls[LinkedIn]']"
+          ]
+        },
+        {
+          "id": "github_url",
+          "selector": [
+            "input[name='urls[GitHub]']",
+            "input[name='urls[Github]']"
+          ]
+        },
+        {
+          "id": "portfolio_url",
+          "selector": [
+            "input[name='urls[Portfolio]']"
+          ]
+        },
+        {
+          "id": "other_url",
+          "selector": [
+            "input[name='urls[Other]']"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "input[name='resume']",
+            "input[type='file']#resume-upload-input"
+          ]
+        },
+        {
+          "id": "additional_info",
+          "selector": [
+            "textarea[name='comments']",
+            "#additional-information"
+          ]
+        },
+        {
+          "id": "eeo_gender",
+          "selector": [
+            "select[name='eeo[gender]']",
+            "[name='eeo[gender]']"
+          ],
+          "options": {
+            "Male": "Male",
+            "Female": "Female",
+            "Decline to self-identify": "Decline to self-identify"
+          }
+        },
+        {
+          "id": "eeo_race",
+          "selector": [
+            "select[name='eeo[race]']",
+            "[name='eeo[race]']"
+          ]
+        },
+        {
+          "id": "eeo_veteran",
+          "selector": [
+            "select[name='eeo[veteran]']",
+            "[name='eeo[veteran]']"
+          ]
+        },
+        {
+          "id": "eeo_disability",
+          "selector": [
+            "select[name='eeo[disability]']",
+            "[name='eeo[disability]']"
+          ]
+        }
+      ],
+      "notes": [
+        "Verified against a live posting: name, email, phone, org, all four urls[...] fields",
+        "and the resume input all resolved exactly. Confirmed additions: input[name=location].",
+        "The eeo[...] fields are optional per employer and were absent from the form checked;",
+        "their names are explicit enough that a miss is a no-op rather than a mis-fill.",
+        "Pronoun pickers appear as a radio group named pronouns on some forms - left to",
+        "generic mode, which maps it from the visible label."
+      ]
+    },
+    {
+      "id": "greenhouse",
+      "name": "Greenhouse",
+      "match": [
+        "boards.greenhouse.io",
+        "job-boards.greenhouse.io",
+        "greenhouse.io"
+      ],
+      "verifiedAgainstLiveForm": "2026-09-18",
+      "notes": [
+        "Two generations of board are live at once. The modern one (job-boards.greenhouse.io)",
+        "drops name attributes entirely, uses bare ids, and renders Country and every EEO",
+        "question as role=combobox text inputs rather than <select>. The legacy board",
+        "(boards.greenhouse.io) uses job_application[...] names and real selects. Both sets of",
+        "selectors are kept, modern first, so one pack covers both.",
+        "Custom questions are #question_<id> and therefore unmappable; generic mode answers",
+        "them from their visible labels."
+      ],
+      "detect": {
+        "any": [
+          "#application-form",
+          "#application_form",
+          "[data-provides='application-form']",
+          "form#s3_upload_form",
+          "div#grnhse_app",
+          "iframe#grnhse_iframe"
+        ]
+      },
+      "meta": {
+        "company": [
+          "#logo img[alt]",
+          ".company-name",
+          "meta[property='og:site_name']"
+        ],
+        "role": [
+          ".app-title",
+          "h1.section-header",
+          "h1",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [
+        "#submit_app",
+        "#application-form button[type='submit']",
+        "button[type='submit']"
+      ],
+      "confirm": [
+        "#application_confirmation",
+        ".application-confirmation",
+        "[data-testid='confirmation']"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[role='combobox'], .select__control, .select2-container",
+          "option": "[role='option'], .select__option, .select2-result-label",
+          "input": "input[role='combobox'], .select__input input"
+        }
+      },
+      "fields": [
+        {
+          "id": "first_name",
+          "selector": [
+            "#first_name",
+            "input[name='job_application[first_name]']",
+            "input[autocomplete='given-name']"
+          ]
+        },
+        {
+          "id": "last_name",
+          "selector": [
+            "#last_name",
+            "input[name='job_application[last_name]']",
+            "input[autocomplete='family-name']"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "#email",
+            "input[name='job_application[email]']"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "#phone",
+            "input[name='job_application[phone]']"
+          ]
+        },
+        {
+          "id": "country",
+          "selector": [
+            "#country"
+          ]
+        },
+        {
+          "id": "full_address",
+          "selector": [
+            "#auto_complete_input",
+            "input[name='job_application[location]']"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "#resume",
+            "input[name='job_application[resume]']",
+            "input[type='file'][id*='resume']"
+          ]
+        },
+        {
+          "id": "cover_letter_file",
+          "selector": [
+            "#cover_letter",
+            "input[name='job_application[cover_letter]']",
+            "input[type='file'][id*='cover']"
+          ]
+        },
+        {
+          "id": "cover_letter_text",
+          "selector": [
+            "#cover_letter_text",
+            "textarea[name*='cover_letter']"
+          ]
+        },
+        {
+          "id": "school",
+          "selector": [
+            "#school",
+            "input[id*='school' i]",
+            "select[id*='school' i]",
+            "#education_school_name_0"
+          ]
+        },
+        {
+          "id": "degree",
+          "selector": [
+            "#degree",
+            "input[id*='degree' i]",
+            "select[id*='degree' i]",
+            "#education_degree_0"
+          ]
+        },
+        {
+          "id": "field_of_study",
+          "selector": [
+            "#discipline",
+            "input[id*='discipline' i]",
+            "select[id*='discipline' i]",
+            "#education_discipline_0"
+          ]
+        },
+        {
+          "id": "eeo_gender",
+          "selector": [
+            "#gender",
+            "#job_application_gender",
+            "select[name*='gender' i]"
+          ]
+        },
+        {
+          "id": "eeo_hispanic",
+          "selector": [
+            "#hispanic_ethnicity",
+            "#job_application_hispanic_ethnicity",
+            "select[name*='hispanic' i]"
+          ]
+        },
+        {
+          "id": "eeo_race",
+          "selector": [
+            "#race",
+            "#job_application_race",
+            "select[name*='race' i]"
+          ]
+        },
+        {
+          "id": "eeo_veteran",
+          "selector": [
+            "#veteran_status",
+            "#job_application_veteran_status",
+            "select[name*='veteran' i]"
+          ]
+        },
+        {
+          "id": "eeo_disability",
+          "selector": [
+            "#disability_status",
+            "#job_application_disability_status",
+            "select[name*='disability' i]"
+          ],
+          "options": {
+            "Yes, I have a disability, or have had one in the past": "Yes, I have a disability, or have had one in the past",
+            "No, I do not have a disability and have not had one in the past": "No, I do not have a disability and have not had one in the past",
+            "I do not want to answer": "I do not want to answer"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ashby",
+      "name": "Ashby",
+      "match": [
+        "jobs.ashbyhq.com",
+        "ashbyhq.com"
+      ],
+      "verifiedAgainstLiveForm": "2026-09-18",
+      "notes": [
+        "Only name, email and resume are true system fields. Phone, location and every link",
+        "field are per-employer custom fields whose name and id are a bare UUID, so they",
+        "cannot be targeted by a pack at all - generic mode answers them from their labels.",
+        "The resume input carries id=_systemfield_resume but no name attribute.",
+        "A bare input[type=file] fallback is deliberately NOT used here: the first file input",
+        "on the page is the 'autofill from resume' uploader at the top of the form, and a",
+        "fallback would attach the resume to the wrong control.",
+        "EEO answers are radio groups named <uuid>__systemfield_eeoc_<x>, matched by suffix."
+      ],
+      "detect": {
+        "any": [
+          "#ashby-application-form-container",
+          "input[name='_systemfield_name']",
+          "[class*='ashby-application-form']",
+          "form[class*='ashby']"
+        ]
+      },
+      "meta": {
+        "company": [
+          "[class*='ashby-job-posting-brief'] img[alt]",
+          "meta[property='og:site_name']"
+        ],
+        "role": [
+          "h1",
+          "[class*='job-posting-header'] h1",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [
+        "[class*='ashby-application-form-submit-button']",
+        "button[type='submit']"
+      ],
+      "confirm": [
+        "[class*='application-confirmation']",
+        "[class*='ashby-application-success']"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[role='combobox'], [class*='_select_'], [class*='ashby-select']",
+          "option": "[role='option'], [class*='_option_']",
+          "input": "input[role='combobox']"
+        }
+      },
+      "fields": [
+        {
+          "id": "full_name",
+          "selector": [
+            "input[name='_systemfield_name']",
+            "#_systemfield_name"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "input[name='_systemfield_email']",
+            "#_systemfield_email"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "input[name='_systemfield_phone']",
+            "#_systemfield_phone"
+          ]
+        },
+        {
+          "id": "full_address",
+          "selector": [
+            "input[name='_systemfield_location']",
+            "#_systemfield_location"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "input[type='file']#_systemfield_resume",
+            "input[type='file'][id*='resume' i]",
+            "input[type='file'][name='_systemfield_resume']"
+          ]
+        },
+        {
+          "id": "linkedin_url",
+          "selector": [
+            "input[name*='linkedin' i]",
+            "input[id*='linkedin' i]"
+          ]
+        },
+        {
+          "id": "github_url",
+          "selector": [
+            "input[name*='github' i]",
+            "input[id*='github' i]"
+          ]
+        },
+        {
+          "id": "portfolio_url",
+          "selector": [
+            "input[name*='website' i]",
+            "input[name*='portfolio' i]"
+          ]
+        },
+        {
+          "id": "eeo_gender",
+          "selector": [
+            "input[type='radio'][name$='__systemfield_eeoc_gender']",
+            "select[name$='__systemfield_eeoc_gender']"
+          ]
+        },
+        {
+          "id": "eeo_race",
+          "selector": [
+            "input[type='radio'][name$='__systemfield_eeoc_race']",
+            "select[name$='__systemfield_eeoc_race']"
+          ]
+        },
+        {
+          "id": "eeo_veteran",
+          "selector": [
+            "input[type='radio'][name$='__systemfield_eeoc_veteran_status']",
+            "select[name$='__systemfield_eeoc_veteran_status']"
+          ]
+        },
+        {
+          "id": "eeo_disability",
+          "selector": [
+            "input[type='radio'][name$='__systemfield_eeoc_disability_status']",
+            "select[name$='__systemfield_eeoc_disability_status']"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "workable",
+      "name": "Workable",
+      "match": [
+        "apply.workable.com",
+        "workable.com"
+      ],
+      "verifiedAgainstLiveForm": "2026-09-18",
+      "detect": {
+        "any": [
+          "form[data-ui='application-form']",
+          "[data-ui='application-form']",
+          "input[data-ui='firstname']"
+        ]
+      },
+      "meta": {
+        "company": [
+          "[data-ui='company-name']",
+          "meta[property='og:site_name']"
+        ],
+        "role": [
+          "[data-ui='job-title']",
+          "h1",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [
+        "button[data-ui='apply-button']",
+        "button[type='submit']"
+      ],
+      "confirm": [
+        "[data-ui='application-submitted']",
+        "[data-ui='thank-you']"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[role='combobox']",
+          "option": "[role='option']"
+        }
+      },
+      "fields": [
+        {
+          "id": "first_name",
+          "selector": [
+            "input[data-ui='firstname']",
+            "input[name='firstname']",
+            "#firstname"
+          ]
+        },
+        {
+          "id": "last_name",
+          "selector": [
+            "input[data-ui='lastname']",
+            "input[name='lastname']",
+            "#lastname"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "input[data-ui='email']",
+            "input[name='email']",
+            "#email"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "input[name='phone']",
+            "input[data-ui='phone']"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "input[type='file'][data-ui='resume']",
+            "input[type='file'][id*='files_input']"
+          ]
+        },
+        {
+          "id": "current_title",
+          "selector": [
+            "input[name='headline']"
+          ]
+        },
+        {
+          "id": "full_address",
+          "selector": [
+            "input[name='address']"
+          ]
+        },
+        {
+          "id": "cover_letter_text",
+          "selector": [
+            "textarea[name='cover_letter']",
+            "textarea[data-ui='cover_letter']"
+          ]
+        },
+        {
+          "id": "additional_info",
+          "selector": [
+            "textarea[name='summary']"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "smartrecruiters",
+      "name": "SmartRecruiters",
+      "match": [
+        "jobs.smartrecruiters.com",
+        "smartrecruiters.com",
+        "smartr.me"
+      ],
+      "verifiedAgainstLiveForm": "2026-09-18",
+      "detect": {
+        "any": [
+          "spl-form-field",
+          "#first-name-input",
+          "#hiring-manager-message-input"
+        ]
+      },
+      "meta": {
+        "company": [
+          "meta[property='og:site_name']",
+          "[data-test='company-name']"
+        ],
+        "role": [
+          "h1",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [],
+      "confirm": [
+        "[data-test='application-confirmation']",
+        "spl-application-confirmation",
+        "[class*='confirmation']"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[role='combobox'], spl-select",
+          "option": "[role='option'], spl-option"
+        }
+      },
+      "fields": [
+        {
+          "id": "first_name",
+          "selector": [
+            "#first-name-input"
+          ]
+        },
+        {
+          "id": "last_name",
+          "selector": [
+            "#last-name-input"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "#email-input"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "#confirm-email-input"
+          ]
+        },
+        {
+          "id": "linkedin_url",
+          "selector": [
+            "#linkedin-input"
+          ]
+        },
+        {
+          "id": "portfolio_url",
+          "selector": [
+            "#website-input"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "#file-input",
+            "input[type='file']"
+          ]
+        },
+        {
+          "id": "cover_letter_text",
+          "selector": [
+            "#hiring-manager-message-input"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pinpoint",
+      "name": "Pinpoint",
+      "match": [
+        "pinpointhq.com"
+      ],
+      "verifiedAgainstLiveForm": "2026-09-18",
+      "detect": {
+        "any": [
+          "#application-form",
+          "form.external-form",
+          "input[name='application_form[application][first_name]']"
+        ]
+      },
+      "meta": {
+        "company": [
+          "meta[property='og:site_name']",
+          ".company-name"
+        ],
+        "role": [
+          "h1",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [
+        "#application-form button[type='submit']",
+        "button[type='submit']"
+      ],
+      "confirm": [
+        ".application-confirmation",
+        "[data-application-submitted]"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[role='combobox'], .select2-container",
+          "option": "[role='option'], .select2-results__option"
+        }
+      },
+      "fields": [
+        {
+          "id": "first_name",
+          "selector": [
+            "#application_form_application_first_name",
+            "input[name='application_form[application][first_name]']"
+          ]
+        },
+        {
+          "id": "last_name",
+          "selector": [
+            "#application_form_application_last_name",
+            "input[name='application_form[application][last_name]']"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "#application_form_application_email",
+            "input[name='application_form[application][email]']"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "#application_form_application_phone",
+            "input[name='application_form[application][phone]']"
+          ]
+        },
+        {
+          "id": "linkedin_url",
+          "selector": [
+            "#application_form_application_linkedin_url",
+            "input[name='application_form[application][linkedin_url]']"
+          ]
+        },
+        {
+          "id": "full_address",
+          "selector": [
+            "#application_form_application_location",
+            "input[name='application_form[application][location]']"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "input[type='file'][name='application_form[application][cv]']",
+            "input[type='file'][name*='[cv]']"
+          ]
+        },
+        {
+          "id": "cover_letter_file",
+          "selector": [
+            "input[type='file'][name*='cover_letter']"
+          ]
+        },
+        {
+          "id": "pronouns",
+          "selector": [
+            "#application_form_equality_monitoring_pronouns"
+          ]
+        },
+        {
+          "id": "privacy_consent",
+          "selector": [
+            "#application_process_information",
+            "input[name='application[process_information]']"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jazzhr",
+      "name": "JazzHR",
+      "match": [
+        "applytojob.com"
+      ],
+      "verifiedAgainstLiveForm": "2026-09-18",
+      "detect": {
+        "any": [
+          "#form_submit_new_resume",
+          "#resumator-firstname-value",
+          "form[data-test='form_submit_new_resume']"
+        ]
+      },
+      "meta": {
+        "company": [
+          "meta[property='og:site_name']",
+          "#resumator-logo img[alt]"
+        ],
+        "role": [
+          "h1",
+          ".job-title",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [
+        "#form_submit_new_resume input[type='submit']",
+        "#form_submit_new_resume button[type='submit']",
+        "button[type='submit']"
+      ],
+      "confirm": [
+        ".resumator-thank-you",
+        "#resumator-application-complete"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[role='combobox']",
+          "option": "[role='option']"
+        }
+      },
+      "fields": [
+        {
+          "id": "first_name",
+          "selector": [
+            "#resumator-firstname-value",
+            "input[name='resumator-firstname-value']"
+          ]
+        },
+        {
+          "id": "last_name",
+          "selector": [
+            "#resumator-lastname-value",
+            "input[name='resumator-lastname-value']"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "#resumator-email-value",
+            "input[name='resumator-email-value']"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "#resumator-phone-value",
+            "input[name='resumator-phone-value']"
+          ]
+        },
+        {
+          "id": "address_line1",
+          "selector": [
+            "#resumator-address-value",
+            "input[name='resumator-address-value']"
+          ]
+        },
+        {
+          "id": "city",
+          "selector": [
+            "#resumator-city-value",
+            "input[name='resumator-city-value']"
+          ]
+        },
+        {
+          "id": "state",
+          "selector": [
+            "#resumator-state-value",
+            "input[name='resumator-state-value']"
+          ]
+        },
+        {
+          "id": "postal_code",
+          "selector": [
+            "#resumator-postal-value",
+            "input[name='resumator-postal-value']"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "#resumator-resume-value",
+            "input[type='file'][name='resumator-resume-value']"
+          ]
+        },
+        {
+          "id": "cover_letter_text",
+          "selector": [
+            "#resumator-coverletter-value",
+            "textarea[name='resumator-coverletter-value']"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recruitee",
+      "name": "Recruitee",
+      "match": [
+        "recruitee.com"
+      ],
+      "verifiedAgainstLiveForm": "2026-09-18",
+      "notes": [
+        "The application lives at /o/<slug>/c/new, not on the posting page itself.",
+        "Every field is namespaced candidate.* and EEO answers are radio groups named",
+        "eeo.<attribute>. Screening questions are candidate.openQuestionAnswers.<id>.content",
+        "for free text and .flag for yes/no, so they carry a per-posting id and cannot be",
+        "packed - generic mode answers them from their labels.",
+        "The phone field has its own country-code button next to it; applyr fills only the",
+        "number and leaves the country picker alone."
+      ],
+      "detect": {
+        "any": [
+          "#offer-application-form",
+          "input[name='candidate.name']",
+          "input[name='candidate.cv']"
+        ]
+      },
+      "meta": {
+        "company": [
+          "meta[property='og:site_name']",
+          "[class*='company-name']"
+        ],
+        "role": [
+          "h1",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [
+        "#offer-application-form button[type='submit']"
+      ],
+      "confirm": [
+        "[class*='application-confirmation']",
+        "[class*='thank-you']"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[role='combobox'], [class*='select']",
+          "option": "[role='option']"
+        }
+      },
+      "fields": [
+        {
+          "id": "full_name",
+          "selector": [
+            "input[name='candidate.name']"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "input[name='candidate.email']"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "input[name='candidate.phone']"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "input[type='file'][name='candidate.cv']"
+          ]
+        },
+        {
+          "id": "cover_letter_file",
+          "selector": [
+            "input[type='file'][name='candidate.coverLetterFile']"
+          ]
+        },
+        {
+          "id": "cover_letter_text",
+          "selector": [
+            "textarea[name='candidate.coverLetter']"
+          ]
+        },
+        {
+          "id": "eeo_gender",
+          "selector": [
+            "input[name='eeo.gender']",
+            "select[name='eeo.gender']"
+          ]
+        },
+        {
+          "id": "eeo_race",
+          "selector": [
+            "input[name='eeo.race']",
+            "select[name='eeo.race']"
+          ]
+        },
+        {
+          "id": "eeo_veteran",
+          "selector": [
+            "input[name='eeo.veteranStatus']",
+            "select[name='eeo.veteranStatus']"
+          ]
+        },
+        {
+          "id": "eeo_disability",
+          "selector": [
+            "input[name^='eeo.disab']",
+            "select[name^='eeo.disab']"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bamboohr",
+      "name": "BambooHR",
+      "match": [
+        "bamboohr.com"
+      ],
+      "verifiedAgainstLiveForm": "2026-09-18",
+      "notes": [
+        "The form is not in the page until 'Apply for This Job' is clicked; applyr's",
+        "MutationObserver picks it up when it appears.",
+        "Address parts are namespaced with a .value suffix (streetAddress.value, city.value,",
+        "state.value, zip.value, countryId.value). Screening questions are",
+        "customQuestionAnswers.short_<id> / .long_<id> and carry a per-posting id, so generic",
+        "mode answers them from their labels.",
+        "submit is deliberately empty: the Submit and Cancel buttons are BOTH type=submit,",
+        "so a selector would log a false submission when the user cancels. The content",
+        "script's button-text heuristic recognises 'Submit Application' and ignores Cancel.",
+        "This form also carries a honeypot (nickname_hpcsaf, labelled 'Please leave this",
+        "field blank') which is fully visible and would otherwise match preferred_name - see",
+        "isIgnored() in content/detector.js."
+      ],
+      "detect": {
+        "any": [
+          "#job-application-form",
+          "input[name='streetAddress.value']",
+          "input[name='linkedinUrl'][id='linkedinUrl']"
+        ]
+      },
+      "meta": {
+        "company": [
+          "meta[property='og:site_name']",
+          "[class*='company-name']"
+        ],
+        "role": [
+          "h1",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [],
+      "confirm": [
+        "[class*='application-confirmation']",
+        "[class*='thank-you']"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[role='combobox'], button[class*='fab-select'], [class*='fabric-select']",
+          "option": "[role='option'], [class*='fab-menu-option']"
+        }
+      },
+      "fields": [
+        {
+          "id": "first_name",
+          "selector": [
+            "#job-application-form input[name='firstName']",
+            "#firstName"
+          ]
+        },
+        {
+          "id": "last_name",
+          "selector": [
+            "#job-application-form input[name='lastName']",
+            "#lastName"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "#job-application-form input[name='email']",
+            "#email"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "#job-application-form input[name='phone']",
+            "#phone"
+          ]
+        },
+        {
+          "id": "address_line1",
+          "selector": [
+            "input[name='streetAddress.value']"
+          ]
+        },
+        {
+          "id": "city",
+          "selector": [
+            "input[name='city.value']"
+          ]
+        },
+        {
+          "id": "state",
+          "selector": [
+            "input[name='state.value']"
+          ]
+        },
+        {
+          "id": "postal_code",
+          "selector": [
+            "input[name='zip.value']"
+          ]
+        },
+        {
+          "id": "country",
+          "selector": [
+            "select[name='countryId.value']"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "#job-application-form input[type='file']"
+          ]
+        },
+        {
+          "id": "desired_salary",
+          "selector": [
+            "#job-application-form input[name='desiredPay']",
+            "#desiredPay"
+          ]
+        },
+        {
+          "id": "portfolio_url",
+          "selector": [
+            "#job-application-form input[name='websiteUrl']",
+            "#websiteUrl"
+          ]
+        },
+        {
+          "id": "linkedin_url",
+          "selector": [
+            "#job-application-form input[name='linkedinUrl']",
+            "#linkedinUrl"
+          ]
+        },
+        {
+          "id": "degree",
+          "selector": [
+            "select[name='educationLevelId']",
+            "#educationLevelId"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "workday",
+      "name": "Workday",
+      "match": [
+        "myworkdayjobs.com",
+        "myworkdaysite.com"
+      ],
+      "verifiedAgainstLiveForm": null,
+      "notes": [
+        "PARTIALLY VERIFIED. On 18 Sep 2026 the public part of the flow was checked",
+        "against a live Workday tenant: the job posting page, the apply chooser",
+        "(adventureButton -> autofillWithResume / applyManually / useMyLastApplication)",
+        "and the apply-flow shell (applyFlowPage, progressBar, progressBarActiveStep,",
+        "backToJobPosting, jobTitleHeading, signInContent, SignInWithEmailButton) all",
+        "resolved exactly as written here.",
+        "",
+        "The form steps themselves could NOT be verified: Workday puts step 1 of 6",
+        "behind mandatory account creation, so My Information, My Experience,",
+        "Application Questions, Voluntary Disclosures and Self Identify are only",
+        "reachable with credentials. Those selectors follow Workday's documented",
+        "data-automation-id conventions and are exercised against fixtures/workday-like.html,",
+        "but they have not been seen on a real form. Treat the first live run as the",
+        "verification step and expect to correct some of them.",
+        "",
+        "Workday tenants also drift: the same data-automation-id can differ between",
+        "tenant versions, which is why generic mode matters more here than elsewhere.",
+        "",
+        "submit is empty on purpose. Workday never has a single submit control - each",
+        "step ends with bottom-navigation-next-button and only the final Review step",
+        "submits, so matching a Next button would log an application that has not been",
+        "sent. Detection falls back to the confirmation heuristic."
+      ],
+      "detect": {
+        "any": [
+          "[data-automation-id='applyFlowPage']",
+          "[data-automation-id='legalNameSection_firstName']",
+          "[data-automation-id='myInformationPage']",
+          "[data-automation-id='progressBar']"
+        ]
+      },
+      "meta": {
+        "company": [
+          "[data-automation-id='headerTitle']",
+          "[data-automation-id='logo'] img[alt]",
+          "meta[property='og:site_name']"
+        ],
+        "role": [
+          "[data-automation-id='jobTitleHeading']",
+          "[data-automation-id='jobPostingHeader']",
+          "h1"
+        ]
+      },
+      "submit": [],
+      "confirm": [
+        "[data-automation-id='applicationSubmitted']",
+        "[data-automation-id='confirmationPage']"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[aria-haspopup='listbox'], [data-automation-id$='Dropdown'], [data-automation-id='multiselectInputContainer']",
+          "option": "[role='option'], [data-automation-id='promptOption']",
+          "input": "input[role='combobox'], [data-automation-id='searchBox'] input"
+        }
+      },
+      "fields": [
+        {
+          "id": "first_name",
+          "selector": [
+            "[data-automation-id='legalNameSection_firstName']"
+          ]
+        },
+        {
+          "id": "last_name",
+          "selector": [
+            "[data-automation-id='legalNameSection_lastName']"
+          ]
+        },
+        {
+          "id": "preferred_name",
+          "selector": [
+            "[data-automation-id='preferredNameSection_firstName']"
+          ]
+        },
+        {
+          "id": "email",
+          "selector": [
+            "[data-automation-id='myInformationPage'] [data-automation-id='email']",
+            "[data-automation-id='addressSection_email']"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "[data-automation-id='phone-number']",
+            "[data-automation-id='phoneNumber']"
+          ]
+        },
+        {
+          "id": "address_line1",
+          "selector": [
+            "[data-automation-id='addressSection_addressLine1']"
+          ]
+        },
+        {
+          "id": "address_line2",
+          "selector": [
+            "[data-automation-id='addressSection_addressLine2']"
+          ]
+        },
+        {
+          "id": "city",
+          "selector": [
+            "[data-automation-id='addressSection_city']"
+          ]
+        },
+        {
+          "id": "state",
+          "selector": [
+            "[data-automation-id='addressSection_countryRegion']"
+          ]
+        },
+        {
+          "id": "postal_code",
+          "selector": [
+            "[data-automation-id='addressSection_postalCode']"
+          ]
+        },
+        {
+          "id": "country",
+          "selector": [
+            "[data-automation-id='countryDropdown']",
+            "[data-automation-id='addressSection_country']"
+          ]
+        },
+        {
+          "id": "how_did_you_hear",
+          "selector": [
+            "[data-automation-id='source']",
+            "[data-automation-id='sourceSection']"
+          ]
+        },
+        {
+          "id": "previously_employed",
+          "selector": [
+            "[data-automation-id='previousWorker']"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "[data-automation-id='resumeSection'] input[type='file']",
+            "[data-automation-id='select-files']",
+            "[data-automation-id='fileUploadInput']"
+          ]
+        },
+        {
+          "id": "current_company",
+          "selector": [
+            "[data-automation-id='company']"
+          ]
+        },
+        {
+          "id": "current_title",
+          "selector": [
+            "[data-automation-id='jobTitle']"
+          ]
+        },
+        {
+          "id": "school",
+          "selector": [
+            "[data-automation-id='school']"
+          ]
+        },
+        {
+          "id": "degree",
+          "selector": [
+            "[data-automation-id='degree']"
+          ]
+        },
+        {
+          "id": "field_of_study",
+          "selector": [
+            "[data-automation-id='formField-fieldOfStudy']"
+          ]
+        },
+        {
+          "id": "linkedin_url",
+          "selector": [
+            "[data-automation-id='linkedinQuestion']"
+          ]
+        },
+        {
+          "id": "earliest_start_date",
+          "selector": [
+            "[data-automation-id='dateInputWrapper']"
+          ]
+        },
+        {
+          "id": "eeo_gender",
+          "selector": [
+            "[data-automation-id='gender']"
+          ]
+        },
+        {
+          "id": "eeo_race",
+          "selector": [
+            "[data-automation-id='ethnicityDropdown']",
+            "[data-automation-id='race']"
+          ]
+        },
+        {
+          "id": "eeo_veteran",
+          "selector": [
+            "[data-automation-id='veteranStatus']"
+          ]
+        },
+        {
+          "id": "eeo_disability",
+          "selector": [
+            "[data-automation-id='selfIdentifiedDisabilityData--disability']",
+            "[data-automation-id='disability']"
+          ]
+        }
+      ]
+    }
+  ]
+}

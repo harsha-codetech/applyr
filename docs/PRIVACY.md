@@ -30,13 +30,47 @@ All of it stays on the device. None of it is synced between machines.
 
 ## Network activity
 
-The extension makes no outbound network requests. Its selector packs are bundled
-files loaded from inside the extension, not fetched.
+**By default the extension makes no outbound network requests at all.** Its
+selector packs are bundled files loaded from inside the extension.
 
-If a future version adds remotely-updated selector packs, it will fetch a static
-JSON file containing CSS selectors only. Such a request would contain no
-personal data and no identifier; this policy will be updated before any such
-version ships.
+There is exactly one feature that can change that, and it is off until you turn
+it on.
+
+### Selector pack updates (optional, off by default)
+
+Applicant-tracking systems redesign their forms without notice. When they do,
+the CSS selectors applyr uses stop matching and it silently stops filling that
+site. **Pack updates** let applyr refresh those selectors from a static JSON
+file instead of waiting for a Chrome Web Store review.
+
+When you enable it in **Settings → Selector packs**:
+
+- applyr requests a separate permission for the pack source. Decline it and the
+  feature stays off.
+- It performs a plain `GET` for one static JSON file, at most once every 12
+  hours and whenever you press *Check now*.
+- The request is sent with `credentials: 'omit'`. It carries **no identifier, no
+  cookies, no profile data, no résumé, no application history, and no query
+  parameters**. The only thing the server can observe is that some browser at
+  your IP address asked for a public file — the same thing it observes for
+  anyone who opens that URL.
+- What comes back is **data, never code**: CSS selector strings, parsed as JSON.
+  Nothing fetched is executed, imported, or inserted into any page.
+- Everything fetched is validated before it is used. A bundle is rejected whole
+  if any pack references a field the extension does not know, points a selector
+  at a password input, routes a document upload at something that is not an
+  upload, claims a host another pack already owns, or uses a wildcard host. A
+  rejected bundle changes nothing and the packs that shipped with the extension
+  keep working.
+- A remote pack can replace or add a pack. It can never remove one, so a source
+  that disappears or goes wrong degrades to what shipped in the store.
+
+You can point it at a different URL, press *Use bundled only* to discard
+everything fetched, or turn it off — at which point applyr stops making network
+requests entirely again.
+
+The default source is a static file published alongside the extension's source
+code, so you can read exactly what it would fetch before enabling anything.
 
 ## Page access
 

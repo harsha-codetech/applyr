@@ -7,7 +7,12 @@
  * fetch would later be added, with the bundled copy as the fallback.
  */
 
+import { mergePacks } from './pack-source.js';
+
 const INDEX_URL = 'src/packs/index.json';
+
+/** Written only by the service worker, and only after validation. */
+export const REMOTE_PACKS_KEY = 'remotePacks';
 
 let cache = null;
 
@@ -17,13 +22,32 @@ async function loadJSON(path) {
   return res.json();
 }
 
-/** @returns {Promise<Array>} every bundled pack, parsed */
+async function loadRemoteOverrides() {
+  try {
+    const out = await chrome.storage.local.get(REMOTE_PACKS_KEY);
+    const stored = out[REMOTE_PACKS_KEY];
+    return stored && Array.isArray(stored.packs) ? stored.packs : [];
+  } catch {
+    // Storage unavailable is not a reason to fail the whole scan.
+    return [];
+  }
+}
+
+/** Drop the memoised list so the next scan picks up a fresh update. */
+export function invalidatePackCache() {
+  cache = null;
+}
+
+/**
+ * Bundled packs with any validated remote overrides layered on top.
+ * @returns {Promise<Array>}
+ */
 export async function loadPacks() {
   if (cache) return cache;
   const index = await loadJSON(INDEX_URL);
-  const packs = await Promise.all(index.packs.map((p) => loadJSON(`src/packs/${p}`)));
-  cache = packs;
-  return packs;
+  const bundled = await Promise.all(index.packs.map((p) => loadJSON(`src/packs/${p}`)));
+  cache = mergePacks(bundled, await loadRemoteOverrides());
+  return cache;
 }
 
 function hostMatches(host, patterns) {

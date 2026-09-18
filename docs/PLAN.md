@@ -79,6 +79,32 @@ written to a live employer form.
   ignores captcha, CSRF, honeypot and `aria-hidden` controls, so question memory
   can never be poured into the field that decides whether you are a bot.
 
+## Remote selector packs — done
+
+The upgrade the pack format was designed for from day one. `npm run packs:bundle`
+writes `packs.json`; an install that has opted in fetches it and a broken
+selector becomes a one-hour fix instead of a store-review cycle.
+
+Three things keep it from being a back door:
+
+1. **Data, never code.** JSON of CSS selector strings, parsed with `JSON.parse`.
+   Nothing fetched is executed, imported, or inserted into a page — which is what
+   keeps it legal under MV3’s ban on remotely-hosted code.
+2. **Off by default, with its own permission.** With it off the extension makes
+   no network requests at all, and the permission is requested only on enable.
+   The privacy claim in the README and PRIVACY.md was rewritten to match rather
+   than left as it was.
+3. **Validated before use, rejected whole.** `core/pack-source.js` refuses a
+   bundle if any pack references an unknown field, points a selector at a
+   password input, routes a document upload at something that is not an upload,
+   claims a host another pack owns, or uses a wildcard host. A remote pack can
+   replace or add, never remove, so a source that goes wrong degrades to what
+   shipped.
+
+The e2e serves a deliberately hostile bundle (`fixtures/bad-packs.json`) and
+asserts it is refused with the reason, that the previously good packs survive,
+and that filling still works afterwards — the rule is tested, not asserted.
+
 ## Naukri assisted mode — done
 
 Read-only, exactly as scoped. Selectors confirmed against a live Naukri search

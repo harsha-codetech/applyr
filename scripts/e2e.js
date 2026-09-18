@@ -549,7 +549,63 @@ async function main() {
     const noNav = await cdp.evaluate(bPage, 'return location.href;');
     check('applyr did not navigate the board page', noNav.includes('naukri-like.html'), noNav.slice(-28));
 
-    // 11. service worker survives a restart ---------------------------------
+    // 11. remote selector packs ---------------------------------------------
+    console.log('\n--- remote packs ---');
+
+    const offStatus = await cdp.evaluate(sw, `
+      return await globalThis.__applyr.packs.status();
+    `);
+    check('pack updates are off by default', offStatus.enabled === false && offStatus.count === 0,
+      `enabled=${offStatus.enabled}, ${offStatus.count} remote packs`);
+
+    const refused = await cdp.evaluate(sw, `
+      return await globalThis.__applyr.packs.update({});
+    `);
+    check('no fetch happens while updates are off', refused.ok === false && /off/i.test(refused.reason),
+      refused.reason);
+
+    // Point it at the real bundle, served locally. The fixture origin is already
+    // in host_permissions for this run, so no permission prompt is involved.
+    const good = await cdp.evaluate(sw, `
+      await globalThis.__applyr.store.patchSettings({ packUpdates: true, packUrl: '${FIXTURE_ORIGIN}/packs.json' });
+      return await globalThis.__applyr.packs.update({ force: true });
+    `);
+    check('a valid bundle is fetched and stored', Boolean(good.ok) && good.count >= 10,
+      good.ok ? `${good.count} packs, dated ${good.updated}` : good.reason);
+
+    const hostile = await cdp.evaluate(sw, `
+      await globalThis.__applyr.store.patchSettings({ packUrl: '${FIXTURE_ORIGIN}/fixtures/bad-packs.json' });
+      return await globalThis.__applyr.packs.update({ force: true });
+    `);
+    check('a hostile bundle is refused', hostile.ok === false && /rejected/i.test(hostile.reason || ''),
+      (hostile.reason || '').slice(0, 96));
+    check('the refused bundle did not replace the good one', hostile.count >= 10,
+      `${hostile.count} packs still loaded`);
+
+    // A page must still fill with remote packs in play.
+    const afterPacks = await cdp.evaluate(sw, `
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(t => t.url && t.url.includes('lever-like'));
+      if (!tab) {
+        const t = await chrome.tabs.create({ url: '${FIXTURE_ORIGIN}/fixtures/lever-like.html' });
+        await new Promise(r => setTimeout(r, 2500));
+        return await chrome.tabs.sendMessage(t.id, { type: 'fill' });
+      }
+      return await chrome.tabs.sendMessage(tab.id, { type: 'fill' });
+    `);
+    check('filling still works with remote packs loaded',
+      Boolean(afterPacks && afterPacks.ok && afterPacks.counts.filled >= 8),
+      afterPacks && afterPacks.counts ? `${afterPacks.counts.filled} filled` : 'fill failed');
+
+    // Back to shipped-only, and confirm that is what the user gets.
+    const cleared = await cdp.evaluate(sw, `
+      await chrome.storage.local.remove('remotePacks');
+      await globalThis.__applyr.store.patchSettings({ packUpdates: false, packUrl: '' });
+      return await globalThis.__applyr.packs.status();
+    `);
+    check('reverting to bundled packs works', cleared.count === 0, `${cleared.count} remote packs`);
+
+    // 12. service worker survives a restart ---------------------------------
     console.log('\n--- worker lifecycle ---');
     const persisted = await cdp.evaluate(sw, `
       const p = await globalThis.__applyr.store.getProfile();

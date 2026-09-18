@@ -43,6 +43,10 @@ the extension does anything else.
 > browser and are readable only by this extension. Export a backup any time from
 > Settings.
 >
+> applyr makes no network requests unless you turn on selector updates, which
+> fetch a list of CSS selectors so it keeps working when a career site is
+> redesigned. That request sends nothing about you.
+>
 > Demographic questions (gender, race, veteran and disability status) are never
 > filled unless you explicitly turn that on, and only ever from values you typed
 > yourself.
@@ -58,6 +62,7 @@ the extension does anything else.
 | `tabs` | Reads the active tab's URL so the panel can show whether applyr is running on that page and offer per-site access. |
 | Host permissions (listed ATS domains) | The content script must read form fields and their labels on application pages in order to fill them. Each listed domain is an applicant-tracking system that hosts job applications. |
 | `*://*.naukri.com/*` | Assisted mode reads the job cards already rendered on a search page the user opened, so the side panel can rank them against the user's profile. It is read-only: no navigation, no requests, no form submission on that domain. |
+| `https://raw.githubusercontent.com/*` (optional) | Not granted at install. Requested only if the user turns on selector-pack updates, which fetch one static JSON file of CSS selectors so a broken ATS selector can be fixed without a store review. The request sends no user data and omits credentials. |
 | `*://*/*` (optional) | Not granted at install. Requested per-site, from a user click in the panel, only when the user wants applyr on a career site not covered above. |
 
 ## Data-safety declaration
@@ -83,13 +88,19 @@ Certifications required by the form:
 
 ## Remote code
 
-None. No `eval`, no remotely-hosted scripts, no CDN. All selector packs are
-bundled JSON. If remote packs are added later they remain data (CSS selectors),
-never executable code.
+None. No `eval`, no remotely-hosted scripts, no CDN-loaded libraries.
+
+The optional pack-update feature fetches a static **JSON** file of CSS selector
+strings. It is parsed with `JSON.parse` and every value is used as a selector;
+nothing fetched is executed, imported or inserted into a page, and the feature is
+off unless the user enables it. This is data, not remotely-hosted code, and it is
+validated against a strict schema before use — see `src/core/pack-source.js` and
+its tests.
 
 ## Pre-submission checklist
 
-- [ ] `npm test` passes
+- [ ] `npm test` passes (including the pack-source validation suite)
+- [ ] `npm run packs:bundle` is current and `packs.json` is committed
 - [ ] `tests/MANUAL.md` walked end to end on a fresh Chrome profile
 - [ ] Version bumped in `manifest.json`
 - [ ] `npm run zip` and the zip loads unpacked cleanly after extraction

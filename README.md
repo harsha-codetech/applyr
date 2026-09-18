@@ -97,9 +97,10 @@ reorder what is in front of you. It never decides anything.
 ## Develop
 
 ```bash
-npm test          # 61 engine tests, no dependencies
+npm test          # 77 engine tests, no dependencies
 npm run serve     # fixtures at http://localhost:5173/fixtures/
 npm run e2e       # loads the extension into real Chrome and drives it over CDP
+npm run packs:bundle  # regenerate packs.json for remote pack updates
 npm run zip       # dist/applyr-<version>.zip for the Web Store
 ```
 
@@ -161,14 +162,21 @@ becomes about thirty seconds.
 
 ## Privacy
 
-No network requests leave the extension. Profile, résumés, saved answers and the
+By default applyr makes no network requests at all. Profile, résumés, saved answers and the
 application log are stored in this browser profile only — `chrome.storage.local`
 for structured data, IndexedDB for file bytes. There is no cloud copy, which also
 means **your only backup is the one you export**.
 
 Demographic questions (gender, race, veteran and disability status, date of
 birth) are never filled unless you explicitly turn that on in Settings, and only
-ever from values you typed yourself. See [docs/PRIVACY.md](docs/PRIVACY.md).
+ever from values you typed yourself.
+
+There is exactly one feature that can reach the network, and it is off until you
+turn it on: **pack updates** fetch a static JSON file of CSS selectors so a
+broken ATS selector can be fixed without a store update. That request carries no
+identifier, no cookies and nothing about you or your applications, it needs its
+own permission which is only requested when you enable it, and everything
+fetched is validated before use. See [docs/PRIVACY.md](docs/PRIVACY.md).
 
 ## Layout
 
@@ -180,6 +188,7 @@ src/background/        service worker: storage owner and message router
 src/sidepanel/         profile editor, fill controls, answers, tracker, settings
 src/packs/             per-ATS selector packs (JSON, describe how to fill)
 src/boards/            per-board read profiles (JSON, describe how to read)
+packs.json             the published pack bundle for opt-in remote updates
 fixtures/              offline test pages
 tests/                 node:test engine suite
 ```
@@ -187,8 +196,8 @@ tests/                 node:test engine suite
 ## Status
 
 v1 is complete and verified in a real Chrome: engine, generic mode, ten packs,
-assisted mode, question memory, document vault, tracker, and a Web Store
-package. 61 unit tests and 38 end-to-end checks pass.
+assisted mode, question memory, document vault, tracker, optional remote pack
+updates, and a Web Store package. 77 unit tests and 45 end-to-end checks pass.
 
 What has not happened yet: a real application submitted through it. Workday's
 form steps in particular have never been seen by this code. See

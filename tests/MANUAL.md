@@ -88,6 +88,17 @@ never advances pagination, and never opens a posting you did not click.
 - [ ] Reload the extension mid-session (`chrome://extensions`) and fill again —
       the worker restarts cleanly and nothing is lost
 
+## 5b. Selector pack updates
+
+- [ ] Settings shows **Selector packs** off, with no network activity in DevTools
+- [ ] Turn it on: Chrome asks for the pack-source permission; decline it and the
+      toggle goes back off
+- [ ] Turn it on and accept: it reports the pack count and when it last checked
+- [ ] Point it at a URL that is not a pack bundle: it reports the failure and
+      keeps using the packs it already had
+- [ ] **Use bundled only** clears them; filling still works
+- [ ] Turn it off: no further requests
+
 ## 6. Before shipping to real sites
 
 Run against one live posting per pack, on a job you are genuinely applying for,

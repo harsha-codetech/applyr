@@ -18,7 +18,8 @@
     "tabs"
   ],
   "optional_host_permissions": [
-    "*://*/*"
+    "*://*/*",
+    "https://raw.githubusercontent.com/*"
   ],
   "host_permissions": [
     "*://jobs.lever.co/*",

@@ -48,7 +48,14 @@ export function defaultProfile() {
       /** Draw a coloured ring around every field applyr touched. */
       highlightFilled: true,
       /** Offer to remember answers to questions applyr could not resolve. */
-      learnUnknownFields: true
+      learnUnknownFields: true,
+      /**
+       * Refresh selector packs from a static JSON file. OFF by default: with it
+       * off the extension makes no network requests at all, which is the whole
+       * privacy claim. Turning it on also requests its own host permission.
+       */
+      packUpdates: false,
+      packUrl: ''
     },
     updatedAt: null
   };

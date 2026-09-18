@@ -3,9 +3,10 @@
  *   - chrome.storage.local  -> profile, question memory, application log
  *   - IndexedDB             -> resume / cover-letter file bytes
  *
- * There is no network code in this file, and no other module in the extension
- * performs a fetch to a third party. That is the product's privacy claim, and it
- * is enforced by keeping all writes funnelled through here.
+ * There is no network code in this file. The only module that can reach the
+ * network is core/pack-source.js, which fetches selector data when the user has
+ * turned pack updates on - it never sends anything, and never touches what is
+ * stored here.
  */
 
 import { defaultProfile, migrateProfile, validateProfile } from './schema.js';

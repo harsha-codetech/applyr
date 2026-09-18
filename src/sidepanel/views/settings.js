@@ -1,6 +1,6 @@
 /** Settings, backup and the coverage report that tells you which site needs a pack. */
 
-import { h, card, toast, confirmInline } from '../ui.js';
+import { h, card, toast, confirmInline, relTime } from '../ui.js';
 import { MSG } from '../../core/messages.js';
 import { download } from './applications.js';
 
@@ -68,6 +68,9 @@ export function render(state, api) {
     ]));
   }
 
+  // -- selector packs --------------------------------------------------------
+  root.append(renderPackUpdates(state, api));
+
   // -- backup ----------------------------------------------------------------
   const importer = h('input', {
     type: 'file',
@@ -124,13 +127,131 @@ export function render(state, api) {
     }, 'Erase all data')
   ]));
 
-  root.append(card('About', [
+  root.append(renderAbout());
+  return root;
+}
+
+/**
+ * Pack updates.
+ *
+ * The one feature that can make a network request, so the card is explicit
+ * about what leaves the device (nothing about you) and what arrives (CSS
+ * selectors, validated before use).
+ */
+function renderPackUpdates(state, api) {
+  const body = h('div', {}, h('div', { class: 'small muted' }, 'Checking…'));
+  const wrap = card('Selector packs', body);
+
+  const draw = (status) => {
+    body.textContent = '';
+    const s = status || {};
+
+    body.append(h('div', { class: 'small muted', style: 'margin-bottom:10px' },
+      'When an ATS redesigns, its selectors break and applyr stops filling that site. '
+      + 'With this on, applyr refreshes them from a static file instead of waiting for '
+      + 'a store update.'));
+
+    body.append(h('label', { class: 'row', style: 'align-items:flex-start; gap:8px; margin-bottom:10px' }, [
+      h('input', {
+        type: 'checkbox',
+        checked: s.enabled,
+        style: 'margin-top:3px',
+        onclick: async (ev) => {
+          const on = ev.target.checked;
+          if (on) {
+            // permissions.request must run inside the click.
+            let granted = false;
+            try {
+              granted = await chrome.permissions.request({ origins: [s.url] });
+            } catch (err) {
+              ev.target.checked = false;
+              toast(err.message);
+              return;
+            }
+            if (!granted) {
+              ev.target.checked = false;
+              toast('Access to the pack source was declined');
+              return;
+            }
+          }
+          await api.send({ type: MSG.PATCH_SETTINGS, patch: { packUpdates: on } });
+          if (on) await api.send({ type: MSG.UPDATE_PACKS, force: true });
+          toast(on ? 'Pack updates on' : 'Pack updates off');
+          refresh();
+        }
+      }),
+      h('div', {}, [
+        h('div', { style: 'font-weight:600' }, 'Keep selector packs up to date'),
+        h('div', { class: 'small muted' },
+          'Off by default. With it off, applyr makes no network requests at all. '
+          + 'With it on, it fetches one static JSON file — no identifier, no cookies, '
+          + 'nothing about you or your applications is sent.')
+      ])
+    ]));
+
+    if (s.enabled) {
+      body.append(h('div', { class: 'small muted', style: 'margin-bottom:6px; word-break:break-all' }, s.url));
+      body.append(h('div', { class: 'row', style: 'gap:6px; flex-wrap:wrap; margin-bottom:8px' }, [
+        s.count
+          ? h('span', { class: 'pill ok' }, `${s.count} packs loaded`)
+          : h('span', { class: 'pill neutral' }, 'using bundled packs'),
+        s.updated ? h('span', { class: 'pill neutral' }, `source dated ${s.updated}`) : null,
+        s.fetchedAt ? h('span', { class: 'small muted' }, `checked ${relTime(new Date(s.fetchedAt).toISOString())}`) : null
+      ]));
+
+      if (s.lastError) {
+        body.append(h('div', { class: 'warnbox small', style: 'margin-bottom:8px' }, [
+          h('div', { style: 'font-weight:600' }, 'Last check failed — bundled packs still in use'),
+          h('div', { class: 'muted' }, s.lastError)
+        ]));
+      }
+
+      body.append(h('div', { class: 'row', style: 'gap:8px' }, [
+        h('button', {
+          class: 'btn ghost',
+          onclick: async (ev) => {
+            ev.target.disabled = true;
+            const res = await api.send({ type: MSG.UPDATE_PACKS, force: true });
+            ev.target.disabled = false;
+            toast(res && res.ok ? `Loaded ${res.count} packs` : (res && res.reason) || 'Check failed');
+            refresh();
+          }
+        }, 'Check now'),
+        s.count
+          ? h('button', {
+            class: 'btn ghost',
+            onclick: async () => {
+              await api.send({ type: MSG.CLEAR_REMOTE_PACKS });
+              toast('Reverted to the packs that shipped with the extension');
+              refresh();
+            }
+          }, 'Use bundled only')
+          : null
+      ]));
+
+      body.append(h('div', { class: 'small muted', style: 'margin-top:8px' },
+        'Fetched packs are validated before use: unknown fields, selectors that point at '
+        + 'a password input, and hosts already claimed by another pack are all rejected, '
+        + 'and the bundled copy keeps working.'));
+    }
+  };
+
+  const refresh = async () => {
+    const res = await api.send({ type: MSG.PACK_STATUS });
+    draw(res && res.status);
+  };
+  refresh();
+
+  return wrap;
+}
+
+function renderAbout() {
+  return card('About', [
     h('div', { class: 'small muted' }, [
       'applyr fills job applications from a profile you control. It never submits a form, ',
-      'never automates a job board, and never sends your data anywhere. ',
+      'never automates a job board, and never sends your data anywhere — the only ',
+      'request it can make is for selector updates, and only if you turn them on. ',
       'Reviewing each application before you submit it is the point, not a limitation.'
     ].join(''))
-  ]));
-
-  return root;
+  ]);
 }

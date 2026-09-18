@@ -11,6 +11,8 @@ import { MSG, OUTCOME } from '../core/messages.js';
 import { profileToValues } from '../core/schema.js';
 import * as store from '../core/storage.js';
 import { bufToBase64 } from '../core/util.js';
+import { DEFAULT_PACK_URL, MIN_CHECK_INTERVAL_MS, fetchPackBundle } from '../core/pack-source.js';
+import { REMOTE_PACKS_KEY, invalidatePackCache } from '../core/packs.js';
 
 // ---------------------------------------------------------------------------
 // Per-tab state (survives worker restarts)
@@ -61,9 +63,13 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     chrome.tabs.create({ url: chrome.runtime.getURL('src/onboarding/welcome.html') });
   }
   await registerDynamicScripts();
+  await maybeUpdatePacks();
 });
 
-chrome.runtime.onStartup.addListener(registerDynamicScripts);
+chrome.runtime.onStartup.addListener(async () => {
+  await registerDynamicScripts();
+  await maybeUpdatePacks();
+});
 
 /**
  * Sites the user granted access to at runtime need their content script
@@ -176,6 +182,91 @@ async function logApplication(meta, { status, counts }) {
   const list = await store.upsertApplicationByUrl(patch);
   notifyPanel({ type: MSG.STATE_CHANGED, what: 'applications' });
   return list;
+}
+
+// ---------------------------------------------------------------------------
+// Remote selector packs
+//
+// Off unless the user turns it on, and gated behind its own host permission.
+// Everything fetched is validated by core/pack-source.js before it is stored;
+// a bundle that fails is discarded whole and the bundled packs keep working.
+// ---------------------------------------------------------------------------
+
+function packUrlFor(settings) {
+  const custom = (settings.packUrl || '').trim();
+  return custom || DEFAULT_PACK_URL;
+}
+
+async function packStatus() {
+  const profile = await store.getProfile();
+  const url = packUrlFor(profile.settings);
+  const out = await chrome.storage.local.get(REMOTE_PACKS_KEY);
+  const stored = out[REMOTE_PACKS_KEY] || null;
+  let granted = false;
+  try {
+    granted = await chrome.permissions.contains({ origins: [url] });
+  } catch {
+    /* malformed custom url */
+  }
+  return {
+    enabled: Boolean(profile.settings.packUpdates),
+    url,
+    granted,
+    count: stored ? stored.count : 0,
+    updated: stored ? stored.updated : null,
+    fetchedAt: stored ? stored.fetchedAt : null,
+    lastError: stored ? stored.lastError || null : null,
+    ids: stored && Array.isArray(stored.packs) ? stored.packs.map((p) => p.id) : []
+  };
+}
+
+async function updatePacks({ force = false } = {}) {
+  const profile = await store.getProfile();
+  if (!profile.settings.packUpdates && !force) {
+    return { ok: false, reason: 'Pack updates are off' };
+  }
+  const url = packUrlFor(profile.settings);
+
+  let granted = false;
+  try {
+    granted = await chrome.permissions.contains({ origins: [url] });
+  } catch {
+    return { ok: false, reason: 'That pack URL is not a valid origin' };
+  }
+  if (!granted) {
+    return { ok: false, reason: 'Permission for the pack source has not been granted', needsPermission: url };
+  }
+
+  const prev = (await chrome.storage.local.get(REMOTE_PACKS_KEY))[REMOTE_PACKS_KEY] || null;
+  if (!force && prev && prev.fetchedAt && Date.now() - prev.fetchedAt < MIN_CHECK_INTERVAL_MS) {
+    return { ok: true, skipped: 'checked recently', ...(await packStatus()) };
+  }
+
+  try {
+    const { packs, updated, count } = await fetchPackBundle(url);
+    await chrome.storage.local.set({
+      [REMOTE_PACKS_KEY]: { packs, updated, count, url, fetchedAt: Date.now(), lastError: null }
+    });
+    invalidatePackCache();
+    notifyPanel({ type: MSG.STATE_CHANGED, what: 'packs' });
+    return { ok: true, ...(await packStatus()) };
+  } catch (err) {
+    // Keep whatever was already validated and stored; only record why.
+    await chrome.storage.local.set({
+      [REMOTE_PACKS_KEY]: { ...(prev || { packs: [], count: 0 }), url, lastError: err.message, checkedAt: Date.now() }
+    });
+    return { ok: false, reason: err.message, ...(await packStatus()) };
+  }
+}
+
+/** Opportunistic check when the worker wakes. No alarms permission needed. */
+async function maybeUpdatePacks() {
+  try {
+    const profile = await store.getProfile();
+    if (profile.settings.packUpdates) await updatePacks({});
+  } catch {
+    /* never let this break startup */
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -335,7 +426,20 @@ async function handle(msg, sender) {
 
     case MSG.WIPE_ALL:
       await store.wipeAll();
+      invalidatePackCache();
       return { ok: true };
+
+    case MSG.PACK_STATUS:
+      return { ok: true, status: await packStatus() };
+
+    case MSG.UPDATE_PACKS:
+      return updatePacks({ force: msg.force === true });
+
+    case MSG.CLEAR_REMOTE_PACKS: {
+      await chrome.storage.local.remove(REMOTE_PACKS_KEY);
+      invalidatePackCache();
+      return { ok: true, status: await packStatus() };
+    }
 
     case MSG.SITE_ACCESS_STATUS: {
       const granted = await chrome.permissions.contains({ origins: [msg.origin] });
@@ -353,5 +457,7 @@ async function handle(msg, sender) {
   }
 }
 
-// Surface the OUTCOME enum for debugging from the worker console.
-globalThis.__applyr = { OUTCOME, store };
+// Surfaced for debugging from the worker console, and used by scripts/e2e.js -
+// a service worker cannot sendMessage to itself, so these are the only way to
+// exercise the router's own handlers from inside it.
+globalThis.__applyr = { OUTCOME, store, packs: { status: packStatus, update: updatePacks } };

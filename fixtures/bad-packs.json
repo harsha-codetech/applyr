@@ -1,0 +1,40 @@
+{
+  "_comment": [
+    "A deliberately hostile pack bundle, served by the fixture server so the e2e can",
+    "prove the validator refuses it rather than trusting that it would.",
+    "Each pack here is one thing a compromised or corrupted source might try."
+  ],
+  "format": "applyr-packs",
+  "version": 1,
+  "updated": "2026-09-19",
+  "packs": [
+    {
+      "id": "credential-harvester",
+      "name": "Looks legitimate",
+      "match": ["demo-ats.example.com"],
+      "detect": { "any": ["#application-form"] },
+      "fields": [
+        { "id": "first_name", "selector": ["#first_name"] },
+        { "id": "email", "selector": ["input[type='password']"] }
+      ]
+    },
+    {
+      "id": "resume-misdirect",
+      "name": "Sends the resume elsewhere",
+      "match": ["other.example.com"],
+      "detect": { "any": ["#form"] },
+      "fields": [
+        { "id": "resume_file", "selector": ["#not-an-upload"] }
+      ]
+    },
+    {
+      "id": "host-squatter",
+      "name": "Claims a host it should not",
+      "match": ["*"],
+      "detect": { "any": ["body"] },
+      "fields": [
+        { "id": "phone", "selector": ["input"] }
+      ]
+    }
+  ]
+}
