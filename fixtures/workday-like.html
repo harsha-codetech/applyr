@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Staff Platform Engineer - Application</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 660px; margin: 32px auto; padding: 0 20px; }
+      .progress { display: flex; gap: 6px; margin: 16px 0 24px; }
+      .progress div { height: 5px; flex: 1; border-radius: 3px; background: #ddd; }
+      .progress div[data-automation-id="progressBarActiveStep"] { background: #0875e1; }
+      .field { margin-bottom: 16px; }
+      label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+      input[type="text"], input[type="email"], input[type="password"], input[type="tel"] {
+        width: 100%; padding: 8px; border: 1px solid #b7bfc7; border-radius: 4px; font: inherit;
+      }
+      .dateWrapper { display: flex; gap: 8px; align-items: center; }
+      .dateWrapper input { width: 70px; text-align: center; }
+      .dateWrapper input.year { width: 90px; }
+      button { padding: 9px 18px; font: inherit; font-weight: 600; border: 0; border-radius: 4px; background: #0875e1; color: #fff; cursor: pointer; }
+      .wd-dropdown { width: 100%; text-align: left; background: #fff; color: #222; border: 1px solid #b7bfc7; font-weight: 400; }
+      #wd-listbox { position: absolute; z-index: 30; background: #fff; border: 1px solid #b7bfc7; border-radius: 4px; min-width: 240px; box-shadow: 0 6px 18px rgba(0,0,0,.14); }
+      #wd-listbox div { padding: 8px 10px; cursor: pointer; }
+      #wd-listbox div:hover { background: #eaf3fd; }
+      .note { background: #fff8e1; border-left: 3px solid #d97706; padding: 8px 12px; font-size: 13px; }
+      fieldset { border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+  </head>
+  <body data-automation-id="applyFlowPage">
+    <h1 data-automation-id="jobTitleHeading">Staff Platform Engineer</h1>
+
+    <div class="progress" data-automation-id="progressBar">
+      <div data-automation-id="progressBarActiveStep" id="p1"></div>
+      <div data-automation-id="progressBarInactiveStep"></div>
+      <div data-automation-id="progressBarInactiveStep"></div>
+      <div data-automation-id="progressBarInactiveStep"></div>
+      <div data-automation-id="progressBarInactiveStep"></div>
+      <div data-automation-id="progressBarInactiveStep"></div>
+    </div>
+    <!-- Workday exposes the wizard position as text for screen readers; applyr
+         reads it so the panel can show which step you are on. -->
+    <p class="small" id="stepText" style="color:#666;font-size:13px;margin:-14px 0 18px">current step 1 of 6</p>
+
+    <p class="note">
+      Reproduces Workday's apply flow. Step 1 of 6 is an account gate — the same
+      wizard chrome as the real form, but a credential screen. applyr must refuse
+      to fill it. Step 2 uses Workday's <code>data-automation-id</code> naming and
+      its three-box date field.
+    </p>
+
+    <!-- ── step 1 of 6: account creation (NOT an application) ───────────── -->
+    <section id="step-signin" data-automation-id="signInContent">
+      <h2>Create Account</h2>
+      <div class="field">
+        <label for="wd-email">Email Address</label>
+        <input type="email" id="wd-email" data-automation-id="email" />
+      </div>
+      <div class="field">
+        <label for="wd-pass">Password</label>
+        <input type="password" id="wd-pass" data-automation-id="password" />
+      </div>
+      <div class="field">
+        <label for="wd-pass2">Verify New Password</label>
+        <input type="password" id="wd-pass2" data-automation-id="verifyPassword" />
+      </div>
+      <button id="continue" data-automation-id="createAccountSubmitButton">Create Account</button>
+    </section>
+
+    <!-- ── step 2 of 6: My Information ─────────────────────────────────── -->
+    <template id="step2">
+      <section data-automation-id="myInformationPage">
+        <h2>My Information</h2>
+
+        <fieldset class="field" data-automation-id="previousWorker">
+          <legend>Have you previously worked for our organization?</legend>
+          <label><input type="radio" name="previousWorker" value="yes" /> Yes</label>
+          <label><input type="radio" name="previousWorker" value="no" /> No</label>
+        </fieldset>
+
+        <div class="field">
+          <label for="wd-first">First Name</label>
+          <input type="text" id="wd-first" data-automation-id="legalNameSection_firstName" />
+        </div>
+        <div class="field">
+          <label for="wd-last">Last Name</label>
+          <input type="text" id="wd-last" data-automation-id="legalNameSection_lastName" />
+        </div>
+        <div class="field">
+          <label for="wd-addr">Address Line 1</label>
+          <input type="text" id="wd-addr" data-automation-id="addressSection_addressLine1" />
+        </div>
+        <div class="field">
+          <label for="wd-city">City</label>
+          <input type="text" id="wd-city" data-automation-id="addressSection_city" />
+        </div>
+        <div class="field">
+          <label for="wd-postal">Postal Code</label>
+          <input type="text" id="wd-postal" data-automation-id="addressSection_postalCode" />
+        </div>
+        <div class="field">
+          <label id="wd-country-label">Country</label>
+          <button type="button" class="wd-dropdown" id="wd-country"
+                  data-automation-id="countryDropdown" aria-haspopup="listbox"
+                  aria-labelledby="wd-country-label">Select One</button>
+        </div>
+        <div class="field">
+          <label for="wd-email2">Email Address</label>
+          <input type="email" id="wd-email2" data-automation-id="email" />
+        </div>
+        <div class="field">
+          <label for="wd-phone">Phone Number</label>
+          <input type="tel" id="wd-phone" data-automation-id="phone-number" />
+        </div>
+
+        <!-- Workday splits one date across three boxes -->
+        <div class="field" data-automation-id="dateInputWrapper">
+          <label data-automation-id="formLabel">Earliest start date</label>
+          <div class="dateWrapper">
+            <input type="text" data-automation-id="dateSectionMonth-input" aria-label="Month" placeholder="MM" />
+            <span>/</span>
+            <input type="text" data-automation-id="dateSectionDay-input" aria-label="Day" placeholder="DD" />
+            <span>/</span>
+            <input type="text" class="year" data-automation-id="dateSectionYear-input" aria-label="Year" placeholder="YYYY" />
+          </div>
+        </div>
+
+        <button type="button" data-automation-id="bottom-navigation-next-button">Save and Continue</button>
+      </section>
+    </template>
+
+    <div id="wd-listbox" role="listbox" hidden>
+      <div role="option">Canada</div>
+      <div role="option">Germany</div>
+      <div role="option">India</div>
+      <div role="option">United Kingdom</div>
+      <div role="option">United States of America</div>
+    </div>
+
+    <script>
+      // Advancing past the account gate swaps in the real first form step, the
+      // way Workday does after sign-in. No page load, so the extension has to
+      // notice the DOM change.
+      document.getElementById('continue').addEventListener('click', () => {
+        document.getElementById('step-signin').remove();
+        document.getElementById('p1').after(...[]);
+        const frag = document.getElementById('step2').content.cloneNode(true);
+        document.querySelector('.note').after(frag);
+        const bars = document.querySelectorAll('.progress div');
+        bars[1].setAttribute('data-automation-id', 'progressBarActiveStep');
+        bars[0].setAttribute('data-automation-id', 'progressBarCompletedStep');
+        document.getElementById('stepText').textContent = 'current step 2 of 6';
+        wireCountry();
+      });
+
+      function wireCountry() {
+        const btn = document.getElementById('wd-country');
+        const list = document.getElementById('wd-listbox');
+        if (!btn) return;
+        btn.addEventListener('mousedown', () => {
+          const r = btn.getBoundingClientRect();
+          list.style.left = r.left + 'px';
+          list.style.top = (r.bottom + window.scrollY + 4) + 'px';
+          list.hidden = !list.hidden;
+        });
+        list.addEventListener('click', (e) => {
+          if (e.target.getAttribute('role') !== 'option') return;
+          btn.textContent = e.target.textContent;
+          list.hidden = true;
+        });
+      }
+    </script>
+  </body>
+</html>

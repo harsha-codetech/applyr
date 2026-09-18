@@ -79,6 +79,45 @@ written to a live employer form.
   ignores captcha, CSRF, honeypot and `aria-hidden` controls, so question memory
   can never be poured into the field that decides whether you are a bot.
 
+## Workday — engine done, pack partially verified
+
+Workday is not like the others, and the honest summary is that the machinery is
+finished and tested while the selectors are not confirmed.
+
+**Verified live** on a real tenant: the job posting page, the apply chooser
+(`adventureButton` → `autofillWithResume` / `applyManually` /
+`useMyLastApplication`), and the apply-flow shell (`applyFlowPage`,
+`progressBar`, `progressBarActiveStep`, `backToJobPosting`, `jobTitleHeading`).
+
+**Not verifiable**: step 1 of 6 is mandatory account creation, so My Information,
+My Experience, Application Questions, Voluntary Disclosures and Self Identify are
+only reachable with credentials. Those selectors follow Workday's documented
+`data-automation-id` conventions and are exercised against
+`fixtures/workday-like.html`, but no real form has ever been seen. The pack
+records `verifiedAgainstLiveForm: null` and says why in its notes. Treat the
+first real application as the verification pass.
+
+### Engine work this required
+
+- **Split date fields.** Workday renders one date as three boxes
+  (`dateSectionMonth-input`, `-Day-`, `-Year-`). The detector now groups them
+  into a single `date-group` descriptor carrying the wrapper's label, and a new
+  adapter fills each segment with its own events — the widget validates per
+  segment, so writing all three silently does nothing otherwise.
+- **Wizard step reporting.** Accessible multi-step forms announce "current step
+  2 of 6" as text, so one regex covers every ATS that bothers, with no per-site
+  configuration. The panel shows it.
+- **A refusal to fill credential screens.** Marking the account gate "not an
+  application" was not enough on its own: an explicit Fill still typed the
+  user's email into it. The content script now refuses any page containing a
+  password field. Known trade-off: some iCIMS and Taleo flows combine account
+  creation with the application, and those will refuse too until this can tell
+  the two apart.
+- **submit is empty for Workday on purpose.** There is no single submit control —
+  each step ends with `bottom-navigation-next-button` and only the final Review
+  step sends anything, so matching a Next button would log an application that
+  was never submitted.
+
 ## Wave-2 packs — complete
 
 Recruitee and BambooHR, the two deferred for want of a live form, are done. All

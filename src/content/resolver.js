@@ -76,6 +76,7 @@ function scorePair(desc, def) {
 
 /** Type compatibility - stops a file input claiming "first name". */
 function typeCompatible(desc, def) {
+  if (desc.kind === 'date-group') return def.type === 'date' || def.type === 'month';
   if (def.type === 'file') return desc.kind === 'file';
   if (desc.kind === 'file') return def.type === 'file';
   if (def.type === 'longtext') return desc.kind === 'textarea' || desc.kind === 'contenteditable' || desc.kind === 'text';

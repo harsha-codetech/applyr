@@ -35,9 +35,10 @@ For a guided walkthrough with sample data, see [docs/DEMO.md](docs/DEMO.md).
 
 ## What works where
 
-**Bundled selector packs** (near-total coverage). Every pack has been checked
-against a real application form, with its selectors resolved read-only in the
-browser — no values were ever written to a live employer form:
+**Bundled selector packs** (near-total coverage). Nine of the ten have been
+checked against a real application form, with their selectors resolved read-only
+in the browser — no values were ever written to a live employer form. Workday is
+the exception, and says so:
 
 | Pack | Checked against |
 |---|---|
@@ -50,6 +51,7 @@ browser — no values were ever written to a live employer form:
 | JazzHR | live posting, 18 Sep 2026 |
 | Recruitee | live posting, 18 Sep 2026 |
 | BambooHR | live posting, 18 Sep 2026 |
+| Workday | **shell only** — apply flow verified live, form steps are account-gated |
 
 Each pack carries a `verifiedAgainstLiveForm` date, enforced by a test, so a
 pack written from guesswork cannot quietly pass as a checked one. ATSs redesign;
@@ -60,13 +62,23 @@ falls back to `autocomplete` tokens, name/id patterns and visible label text, so
 an unknown ATS still fills most of the form. Verified against the legacy-style
 fixture at 92%.
 
-Manifest-declared hosts also include Teamtailor, Breezy, Workday and iCIMS —
-those run in generic mode until a pack is written for them.
+Manifest-declared hosts also include Teamtailor, Breezy and iCIMS — those run in
+generic mode until a pack is written for them.
+
+**Workday is the honest exception.** Its public apply flow was verified live, but
+Workday puts step 1 of 6 behind mandatory account creation, so the form steps
+themselves have never been seen by this code. Those selectors follow Workday’s
+documented conventions and are exercised against a fixture, but expect to correct
+some of them on your first real application. The pack records this as
+`verifiedAgainstLiveForm: null`.
+
+applyr also refuses outright to fill any page containing a password field, which
+is what Workday’s step 1 is.
 
 ## Develop
 
 ```bash
-npm test          # 31 engine tests, no dependencies
+npm test          # 51 engine tests, no dependencies
 npm run serve     # fixtures at http://localhost:5173/fixtures/
 npm run e2e       # loads the extension into real Chrome and drives it over CDP
 npm run zip       # dist/applyr-<version>.zip for the Web Store
@@ -150,6 +162,11 @@ tests/                 node:test engine suite
 
 ## Status
 
-v1 is complete: engine, generic mode, three packs, question memory, document
-vault, tracker, and a Web Store package. Workday's multi-step wizard and a
-Naukri assisted-browse mode are the next phase — see [docs/PLAN.md](docs/PLAN.md).
+v1 is complete and verified in a real Chrome: engine, generic mode, ten packs,
+question memory, document vault, tracker, and a Web Store package. 51 unit tests
+and 32 end-to-end checks pass.
+
+What has not happened yet: a real application submitted through it. Workday's
+form steps in particular have never been seen by this code. See
+[docs/PLAN.md](docs/PLAN.md) for what is left, and
+[tests/MANUAL.md](tests/MANUAL.md) for the checks a person still has to make.

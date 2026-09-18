@@ -5,6 +5,7 @@ import { verifyEntry } from '../verify.js';
 import { fillText } from './text.js';
 import { fillSelect, fillCheckbox, fillRadioGroup } from './choice.js';
 import { fillCombobox } from './combobox.js';
+import { fillDateGroup } from './date.js';
 import { fillFile, acceptsFile } from './file.js';
 import { sleep } from './dom.js';
 
@@ -48,6 +49,9 @@ export async function applyEntry(entry, ctx) {
           break;
         case 'combobox':
           await fillCombobox(desc, value, ctx.widgets);
+          break;
+        case 'date-group':
+          await fillDateGroup(desc, value);
           break;
         default:
           await fillText(desc, value);

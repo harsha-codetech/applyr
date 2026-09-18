@@ -95,6 +95,12 @@ export function render(state, api) {
     ]),
     h('div', { class: 'small muted', style: 'margin-top:8px' },
       `${tab.fieldCount} fields · ${packLine}`),
+    tab.step
+      ? h('div', { class: 'small', style: 'margin-top:4px' }, [
+        h('span', { class: 'pill neutral' }, `step ${tab.step.current} of ${tab.step.total}`),
+        h('span', { class: 'muted', style: 'margin-left:6px' }, 'fill each step as you reach it')
+      ])
+      : null,
     h('button', {
       class: 'btn wide',
       style: 'margin-top:10px',

@@ -1,0 +1,171 @@
+{
+  "id": "workday",
+  "name": "Workday",
+  "match": [
+    "myworkdayjobs.com",
+    "myworkdaysite.com"
+  ],
+  "verifiedAgainstLiveForm": null,
+  "notes": [
+    "PARTIALLY VERIFIED. On 18 Sep 2026 the public part of the flow was checked",
+    "against a live Workday tenant: the job posting page, the apply chooser",
+    "(adventureButton -> autofillWithResume / applyManually / useMyLastApplication)",
+    "and the apply-flow shell (applyFlowPage, progressBar, progressBarActiveStep,",
+    "backToJobPosting, jobTitleHeading, signInContent, SignInWithEmailButton) all",
+    "resolved exactly as written here.",
+    "",
+    "The form steps themselves could NOT be verified: Workday puts step 1 of 6",
+    "behind mandatory account creation, so My Information, My Experience,",
+    "Application Questions, Voluntary Disclosures and Self Identify are only",
+    "reachable with credentials. Those selectors follow Workday's documented",
+    "data-automation-id conventions and are exercised against fixtures/workday-like.html,",
+    "but they have not been seen on a real form. Treat the first live run as the",
+    "verification step and expect to correct some of them.",
+    "",
+    "Workday tenants also drift: the same data-automation-id can differ between",
+    "tenant versions, which is why generic mode matters more here than elsewhere.",
+    "",
+    "submit is empty on purpose. Workday never has a single submit control - each",
+    "step ends with bottom-navigation-next-button and only the final Review step",
+    "submits, so matching a Next button would log an application that has not been",
+    "sent. Detection falls back to the confirmation heuristic."
+  ],
+  "detect": {
+    "any": [
+      "[data-automation-id='applyFlowPage']",
+      "[data-automation-id='legalNameSection_firstName']",
+      "[data-automation-id='myInformationPage']",
+      "[data-automation-id='progressBar']"
+    ]
+  },
+  "meta": {
+    "company": [
+      "[data-automation-id='headerTitle']",
+      "[data-automation-id='logo'] img[alt]",
+      "meta[property='og:site_name']"
+    ],
+    "role": [
+      "[data-automation-id='jobTitleHeading']",
+      "[data-automation-id='jobPostingHeader']",
+      "h1"
+    ]
+  },
+  "submit": [],
+  "confirm": [
+    "[data-automation-id='applicationSubmitted']",
+    "[data-automation-id='confirmationPage']"
+  ],
+  "widgets": {
+    "combobox": {
+      "trigger": "[aria-haspopup='listbox'], [data-automation-id$='Dropdown'], [data-automation-id='multiselectInputContainer']",
+      "option": "[role='option'], [data-automation-id='promptOption']",
+      "input": "input[role='combobox'], [data-automation-id='searchBox'] input"
+    }
+  },
+  "fields": [
+    {
+      "id": "first_name",
+      "selector": ["[data-automation-id='legalNameSection_firstName']"]
+    },
+    {
+      "id": "last_name",
+      "selector": ["[data-automation-id='legalNameSection_lastName']"]
+    },
+    {
+      "id": "preferred_name",
+      "selector": ["[data-automation-id='preferredNameSection_firstName']"]
+    },
+    {
+      "id": "email",
+      "selector": ["[data-automation-id='myInformationPage'] [data-automation-id='email']", "[data-automation-id='addressSection_email']"]
+    },
+    {
+      "id": "phone",
+      "selector": ["[data-automation-id='phone-number']", "[data-automation-id='phoneNumber']"]
+    },
+    {
+      "id": "address_line1",
+      "selector": ["[data-automation-id='addressSection_addressLine1']"]
+    },
+    {
+      "id": "address_line2",
+      "selector": ["[data-automation-id='addressSection_addressLine2']"]
+    },
+    {
+      "id": "city",
+      "selector": ["[data-automation-id='addressSection_city']"]
+    },
+    {
+      "id": "state",
+      "selector": ["[data-automation-id='addressSection_countryRegion']"]
+    },
+    {
+      "id": "postal_code",
+      "selector": ["[data-automation-id='addressSection_postalCode']"]
+    },
+    {
+      "id": "country",
+      "selector": ["[data-automation-id='countryDropdown']", "[data-automation-id='addressSection_country']"]
+    },
+    {
+      "id": "how_did_you_hear",
+      "selector": ["[data-automation-id='source']", "[data-automation-id='sourceSection']"]
+    },
+    {
+      "id": "previously_employed",
+      "selector": ["[data-automation-id='previousWorker']"]
+    },
+    {
+      "id": "resume_file",
+      "selector": [
+        "[data-automation-id='resumeSection'] input[type='file']",
+        "[data-automation-id='select-files']",
+        "[data-automation-id='fileUploadInput']"
+      ]
+    },
+    {
+      "id": "current_company",
+      "selector": ["[data-automation-id='company']"]
+    },
+    {
+      "id": "current_title",
+      "selector": ["[data-automation-id='jobTitle']"]
+    },
+    {
+      "id": "school",
+      "selector": ["[data-automation-id='school']"]
+    },
+    {
+      "id": "degree",
+      "selector": ["[data-automation-id='degree']"]
+    },
+    {
+      "id": "field_of_study",
+      "selector": ["[data-automation-id='formField-fieldOfStudy']"]
+    },
+    {
+      "id": "linkedin_url",
+      "selector": ["[data-automation-id='linkedinQuestion']"]
+    },
+    {
+      "id": "earliest_start_date",
+      "selector": ["[data-automation-id='dateInputWrapper']"]
+    },
+    {
+      "id": "eeo_gender",
+      "selector": ["[data-automation-id='gender']"]
+    },
+    {
+      "id": "eeo_race",
+      "selector": ["[data-automation-id='ethnicityDropdown']", "[data-automation-id='race']"]
+    },
+    {
+      "id": "eeo_veteran",
+      "selector": ["[data-automation-id='veteranStatus']"]
+    },
+    {
+      "id": "eeo_disability",
+      "selector": ["[data-automation-id='selfIdentifiedDisabilityData--disability']", "[data-automation-id='disability']"]
+    }
+  ]
+}

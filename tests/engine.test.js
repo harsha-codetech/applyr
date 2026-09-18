@@ -16,7 +16,8 @@ import assert from 'node:assert/strict';
 import { normalizeText, questionKey, similarity, looksYes } from '../src/core/util.js';
 import { defaultProfile, profileToValues, completeness, missingCoreFields } from '../src/core/schema.js';
 import { buildPlan } from '../src/content/resolver.js';
-import { isIgnored } from '../src/content/detector.js';
+import { isIgnored, looksLikeApplication } from '../src/content/detector.js';
+import { parseDateParts } from '../src/content/adapters/date.js';
 import { matchOption } from '../src/content/adapters/choice.js';
 import { verifyEntry } from '../src/content/verify.js';
 import { OUTCOME } from '../src/core/messages.js';
@@ -360,6 +361,29 @@ test('tabindex=-1 alone does not disqualify a field', () => {
   // Treating it as a honeypot signal silently dropped real fields.
   assert.ok(!isIgnored(fakeEl({ name: 'countryId.value', tabindex: '-1', label: 'Country *' })));
   assert.ok(!isIgnored(fakeEl({ name: 'educationLevelId', tabindex: '-1', label: 'Highest Education Obtained *' })));
+});
+
+test('a page asking for a password is never an application', () => {
+  // Workday's apply flow opens on account creation wearing the same wizard
+  // chrome as the form - same progress bar, "step 1 of 6".
+  const withPassword = {
+    querySelector: (sel) => (sel === 'input[type="password"]' ? {} : null),
+    title: 'Staff Engineer - Apply',
+    body: { innerText: 'current step 1 of 6 Create Account Email Address Password' }
+  };
+  const d = [desc({ attrs: 'email' }), desc({ attrs: 'password' }), desc({ attrs: 'verifyPassword' })];
+  assert.equal(looksLikeApplication(d, withPassword), false);
+});
+
+test('parseDateParts reads the formats forms actually use', () => {
+  assert.deepEqual(parseDateParts('2026-11-02'), { y: '2026', m: '11', d: '02' });
+  assert.deepEqual(parseDateParts('2026-11'), { y: '2026', m: '11', d: '01' });
+  assert.deepEqual(parseDateParts('11/02/2026'), { y: '2026', m: '11', d: '02' });
+  // 25 cannot be a month, so this is dd/mm/yyyy.
+  assert.deepEqual(parseDateParts('25/12/2026'), { y: '2026', m: '12', d: '25' });
+  assert.equal(parseDateParts('2026').y, '2026');
+  assert.equal(parseDateParts(''), null);
+  assert.equal(parseDateParts('as soon as possible'), null);
 });
 
 test('ordinary fields are not caught by the ignore guard', () => {

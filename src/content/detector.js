@@ -282,8 +282,40 @@ function optionsOfGroup(els) {
   }));
 }
 
+/**
+ * Split date inputs.
+ *
+ * Workday renders a single date as three separate text boxes -
+ * `dateSectionMonth-input`, `dateSectionDay-input`, `dateSectionYear-input` -
+ * inside one wrapper. Treated individually they are three unlabelled numeric
+ * fields that no taxonomy pattern matches; worse, a naive fill would put an
+ * entire ISO date into the month box. Grouping them into one descriptor lets
+ * the resolver see a single "date" field with the wrapper's label.
+ */
+const DATE_PART = /dateSection(Month|Day|Year)/i;
+
+export function datePartKind(el) {
+  const aid = el.getAttribute && el.getAttribute('data-automation-id');
+  if (!aid) return null;
+  const m = aid.match(DATE_PART);
+  return m ? m[1].toLowerCase() : null;
+}
+
+function dateWrapperOf(el) {
+  return el.closest('[data-automation-id="dateInputWrapper"]')
+    || el.closest('[data-automation-id*="dateWidget" i]')
+    || el.closest('[data-automation-id*="formField" i]')
+    || (el.parentElement && el.parentElement.parentElement)
+    || el.parentElement;
+}
+
 function currentValue(desc) {
   switch (desc.kind) {
+    case 'date-group': {
+      const { month, day, year } = desc.parts;
+      const v = [year, month, day].map((p) => (p && p.value ? p.value : '')).filter(Boolean);
+      return v.length ? v.join('-') : '';
+    }
     case 'checkbox':
       return desc.el.checked ? 'true' : '';
     case 'radio-group': {
@@ -346,7 +378,38 @@ export function scan(root = document) {
   const descriptors = [];
   const radioGroups = new Map();
 
+  // --- split date inputs, grouped before anything else claims them ---------
+  const dateGroups = new Map();
+  const consumed = new Set();
   for (const el of controls) {
+    const part = datePartKind(el);
+    if (!part) continue;
+    const wrapper = dateWrapperOf(el);
+    if (!wrapper) continue;
+    if (!dateGroups.has(wrapper)) dateGroups.set(wrapper, {});
+    dateGroups.get(wrapper)[part] = el;
+    consumed.add(el);
+  }
+  for (const [wrapper, parts] of dateGroups) {
+    const anchor = parts.month || parts.year || parts.day;
+    if (!anchor || Object.keys(parts).length < 2) {
+      // A lone part is not a date group; let the normal path handle it.
+      for (const el of Object.values(parts)) consumed.delete(el);
+      continue;
+    }
+    const wrapperLabel = textOf(wrapper.querySelector('label, [data-automation-id*="ormLabel" i], legend'));
+    descriptors.push(makeDescriptor({
+      el: anchor,
+      kind: 'date-group',
+      parts,
+      label: wrapperLabel || labelFor(anchor),
+      attrs: wrapper.getAttribute('data-automation-id') || attrHaystack(anchor),
+      required: Object.values(parts).some((p) => p.required)
+    }));
+  }
+
+  for (const el of controls) {
+    if (consumed.has(el)) continue;
     const tag = el.tagName;
     const type = (el.type || '').toLowerCase();
 
@@ -432,6 +495,12 @@ export function scan(root = document) {
 
 /** Heuristic: does this page look like a job application rather than a login? */
 export function looksLikeApplication(descriptors, doc = document) {
+  // A job application never asks for a password. Workday's apply flow opens on
+  // an account-creation step that is otherwise indistinguishable from a form -
+  // same wizard chrome, same progress bar, "step 1 of 6" - and filling it would
+  // mean typing the user's details into a credential screen.
+  if (doc.querySelector && doc.querySelector('input[type="password"]')) return false;
+
   if (descriptors.length < 3) return false;
   const hasFile = descriptors.some((d) => d.kind === 'file');
   const hasEmail = descriptors.some((d) => /mail/i.test(d.normAttrs) || /mail/i.test(d.normLabel));

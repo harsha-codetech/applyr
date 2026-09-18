@@ -14,6 +14,13 @@ import { normalizeText } from '../core/util.js';
 function readBack(desc) {
   const el = desc.el;
   switch (desc.kind) {
+    case 'date-group': {
+      const p = desc.parts || {};
+      const y = p.year && p.year.value;
+      const m = p.month && p.month.value;
+      const d = p.day && p.day.value;
+      return y || m || d ? [y, m, d].filter(Boolean).join('-') : '';
+    }
     case 'checkbox':
       return el.checked ? 'true' : 'false';
     case 'radio-group': {

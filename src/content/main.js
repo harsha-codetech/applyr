@@ -46,6 +46,20 @@ function textFromSelectors(selectors) {
   return '';
 }
 
+/**
+ * Multi-step wizards announce their position in text for screen readers -
+ * Workday renders "current step 2 of 6" - so one regex covers every ATS that
+ * bothers to be accessible, with no per-site configuration.
+ */
+function readStep() {
+  const text = ((document.body && document.body.innerText) || '').slice(0, 3000);
+  const m = text.match(/step\s+(\d+)\s+of\s+(\d+)/i);
+  if (!m) return null;
+  const current = Number(m[1]);
+  const total = Number(m[2]);
+  return total > 1 && current <= total ? { current, total } : null;
+}
+
 function readMeta() {
   const sel = packMetaSelectors(state.pack);
   const role = textFromSelectors(sel.role) || textFromSelectors(['h1', 'meta[property="og:title"]']) || document.title;
@@ -96,7 +110,8 @@ async function doScan({ announce = true } = {}) {
       pack: state.pack ? state.pack.id : null,
       packName: state.pack ? state.pack.name : 'Generic mode',
       via: state.via,
-      meta: state.meta
+      meta: state.meta,
+      step: readStep()
     };
     if (announce) safeSend(payload);
     if (isApp) watchSubmit();
@@ -112,6 +127,22 @@ async function doScan({ announce = true } = {}) {
 
 async function doFill({ only = null } = {}) {
   if (state.filling) return { ok: false, reason: 'already filling' };
+
+  // Never write into a page that is asking for a password. Workday's apply flow
+  // opens on account creation wearing the same wizard chrome as the form, and
+  // marking it "not an application" was not enough on its own: an explicit Fill
+  // still typed the user's email into the credential screen.
+  //
+  // Known trade-off: a few ATSs (some iCIMS and Taleo flows) combine account
+  // creation with the application itself. Those will refuse too, and have to be
+  // filled by hand until this can tell the two apart.
+  if (document.querySelector('input[type="password"]')) {
+    return {
+      ok: false,
+      reason: 'This page is asking for a password - applyr does not fill sign-in or account screens'
+    };
+  }
+
   state.filling = true;
   overlay.clearRings();
 

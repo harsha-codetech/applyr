@@ -203,7 +203,8 @@ async function handle(msg, sender) {
         pack: msg.pack,
         packName: msg.packName,
         via: msg.via,
-        meta: msg.meta
+        meta: msg.meta,
+        step: msg.step
       });
       return { ok: true };
     }

@@ -428,7 +428,70 @@ async function main() {
       !(gfill.results || []).some((r) => /nickname|leave this field blank/i.test(`${r.label} ${r.key}`)),
       `${gfill?.counts?.total} fields planned, honeypot excluded`);
 
-    // 9. service worker survives a restart ----------------------------------
+    // 9. Workday: the account gate, then the wizard step --------------------
+    console.log('\n--- workday wizard ---');
+    const wd = `${FIXTURE_ORIGIN}/fixtures/workday-like.html`;
+    const { targetId: wdId } = await cdp.send('Target.createTarget', { url: wd });
+    const { sessionId: wdPage } = await cdp.send('Target.attachToTarget', { targetId: wdId, flatten: true });
+    await cdp.send('Runtime.enable', {}, wdPage);
+    await sleep(2200);
+
+    const gate = await cdp.evaluate(sw, `
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(t => t.url && t.url.includes('workday-like'));
+      return await chrome.tabs.sendMessage(tab.id, { type: 'scan' });
+    `);
+    check('account gate is not treated as an application', gate && gate.isApplication === false,
+      `isApplication=${gate && gate.isApplication}, pack=${gate && gate.pack}`);
+    check('wizard step is reported', Boolean(gate && gate.step),
+      gate && gate.step ? `step ${gate.step.current} of ${gate.step.total}` : 'no step read');
+
+    // Filling the gate must be refused even if asked directly.
+    const gateFill = await cdp.evaluate(sw, `
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(t => t.url && t.url.includes('workday-like'));
+      await chrome.tabs.sendMessage(tab.id, { type: 'fill' });
+      return true;
+    `);
+    const gateState = await cdp.evaluate(wdPage, `
+      return {
+        email: (document.getElementById('wd-email') || {}).value || '',
+        pass: (document.getElementById('wd-pass') || {}).value || ''
+      };
+    `);
+    check('credentials screen left untouched', gateState.email === '' && gateState.pass === '',
+      gateState.email || gateState.pass ? `email="${gateState.email}" password set=${Boolean(gateState.pass)}` : 'nothing written');
+
+    // Advance past the gate; the form step replaces it with no page load.
+    await cdp.evaluate(wdPage, "document.getElementById('continue').click(); return true;");
+    await sleep(1800);
+
+    const wdFill = await cdp.evaluate(sw, `
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(t => t.url && t.url.includes('workday-like'));
+      return await chrome.tabs.sendMessage(tab.id, { type: 'fill' });
+    `);
+    check('workday step fills', Boolean(wdFill && wdFill.ok && wdFill.counts.filled >= 6),
+      wdFill && wdFill.counts ? `${wdFill.counts.filled} filled, ${wdFill.counts.attention} to check` : 'fill failed');
+
+    const wdDom = await cdp.evaluate(wdPage, `
+      const v = (aid) => { const el = document.querySelector('[data-automation-id="' + aid + '"]'); return el ? el.value : null; };
+      return {
+        first: v('legalNameSection_firstName'), last: v('legalNameSection_lastName'),
+        city: v('addressSection_city'), postal: v('addressSection_postalCode'),
+        phone: v('phone-number'),
+        country: (document.getElementById('wd-country') || {}).textContent || '',
+        month: v('dateSectionMonth-input'), day: v('dateSectionDay-input'), year: v('dateSectionYear-input')
+      };
+    `);
+    check('workday data-automation-id fields fill', wdDom.first === 'Ada' && wdDom.last === 'Lovelace' && wdDom.city === 'Bengaluru',
+      `${wdDom.first} ${wdDom.last}, ${wdDom.city} ${wdDom.postal}`);
+    check('workday dropdown commits', /India/.test(wdDom.country), wdDom.country.trim());
+    check('split date fills across all three boxes',
+      wdDom.month === '11' && wdDom.day === '02' && wdDom.year === '2026',
+      `${wdDom.month}/${wdDom.day}/${wdDom.year}`);
+
+    // 10. service worker survives a restart ---------------------------------
     console.log('\n--- worker lifecycle ---');
     const persisted = await cdp.evaluate(sw, `
       const p = await globalThis.__applyr.store.getProfile();

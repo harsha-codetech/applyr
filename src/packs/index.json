@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "updated": "2026-09-18",
   "packs": [
     "lever.json",
@@ -10,6 +10,7 @@
     "pinpoint.json",
     "jazzhr.json",
     "recruitee.json",
-    "bamboohr.json"
+    "bamboohr.json",
+    "workday.json"
   ]
 }
