@@ -6,11 +6,20 @@
     "job-boards.greenhouse.io",
     "greenhouse.io"
   ],
-  "verifiedAgainstLiveForm": null,
+  "verifiedAgainstLiveForm": "2026-09-18",
+  "notes": [
+    "Two generations of board are live at once. The modern one (job-boards.greenhouse.io)",
+    "drops name attributes entirely, uses bare ids, and renders Country and every EEO",
+    "question as role=combobox text inputs rather than <select>. The legacy board",
+    "(boards.greenhouse.io) uses job_application[...] names and real selects. Both sets of",
+    "selectors are kept, modern first, so one pack covers both.",
+    "Custom questions are #question_<id> and therefore unmappable; generic mode answers",
+    "them from their visible labels."
+  ],
   "detect": {
     "any": [
-      "#application_form",
       "#application-form",
+      "#application_form",
       "[data-provides='application-form']",
       "form#s3_upload_form",
       "div#grnhse_app",
@@ -32,8 +41,8 @@
   },
   "submit": [
     "#submit_app",
-    "button[type='submit']",
-    "input[type='submit']"
+    "#application-form button[type='submit']",
+    "button[type='submit']"
   ],
   "confirm": [
     "#application_confirmation",
@@ -42,9 +51,9 @@
   ],
   "widgets": {
     "combobox": {
-      "trigger": ".select__control, [role='combobox'], .select2-container",
-      "option": ".select__option, [role='option'], .select2-result-label",
-      "input": ".select__input input, input[role='combobox']"
+      "trigger": "[role='combobox'], .select__control, .select2-container",
+      "option": "[role='option'], .select__option, .select2-result-label",
+      "input": "input[role='combobox'], .select__input input"
     }
   },
   "fields": [
@@ -79,6 +88,12 @@
       ]
     },
     {
+      "id": "country",
+      "selector": [
+        "#country"
+      ]
+    },
+    {
       "id": "full_address",
       "selector": [
         "#auto_complete_input",
@@ -109,29 +124,9 @@
       ]
     },
     {
-      "id": "linkedin_url",
-      "selector": [
-        "input[id*='linkedin' i]",
-        "input[name*='linkedin' i]"
-      ]
-    },
-    {
-      "id": "github_url",
-      "selector": [
-        "input[id*='github' i]",
-        "input[name*='github' i]"
-      ]
-    },
-    {
-      "id": "portfolio_url",
-      "selector": [
-        "input[id*='website' i]",
-        "input[id*='portfolio' i]"
-      ]
-    },
-    {
       "id": "school",
       "selector": [
+        "#school",
         "input[id*='school' i]",
         "select[id*='school' i]",
         "#education_school_name_0"
@@ -140,6 +135,7 @@
     {
       "id": "degree",
       "selector": [
+        "#degree",
         "input[id*='degree' i]",
         "select[id*='degree' i]",
         "#education_degree_0"
@@ -148,6 +144,7 @@
     {
       "id": "field_of_study",
       "selector": [
+        "#discipline",
         "input[id*='discipline' i]",
         "select[id*='discipline' i]",
         "#education_discipline_0"
@@ -156,14 +153,15 @@
     {
       "id": "eeo_gender",
       "selector": [
+        "#gender",
         "#job_application_gender",
-        "select[name*='gender' i]",
-        "[aria-label*='gender' i]"
+        "select[name*='gender' i]"
       ]
     },
     {
       "id": "eeo_hispanic",
       "selector": [
+        "#hispanic_ethnicity",
         "#job_application_hispanic_ethnicity",
         "select[name*='hispanic' i]"
       ]
@@ -171,6 +169,7 @@
     {
       "id": "eeo_race",
       "selector": [
+        "#race",
         "#job_application_race",
         "select[name*='race' i]"
       ]
@@ -178,6 +177,7 @@
     {
       "id": "eeo_veteran",
       "selector": [
+        "#veteran_status",
         "#job_application_veteran_status",
         "select[name*='veteran' i]"
       ]
@@ -185,6 +185,7 @@
     {
       "id": "eeo_disability",
       "selector": [
+        "#disability_status",
         "#job_application_disability_status",
         "select[name*='disability' i]"
       ],

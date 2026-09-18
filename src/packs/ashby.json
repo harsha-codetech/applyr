@@ -5,13 +5,23 @@
     "jobs.ashbyhq.com",
     "ashbyhq.com"
   ],
-  "verifiedAgainstLiveForm": null,
+  "verifiedAgainstLiveForm": "2026-09-18",
+  "notes": [
+    "Only name, email and resume are true system fields. Phone, location and every link",
+    "field are per-employer custom fields whose name and id are a bare UUID, so they",
+    "cannot be targeted by a pack at all - generic mode answers them from their labels.",
+    "The resume input carries id=_systemfield_resume but no name attribute.",
+    "A bare input[type=file] fallback is deliberately NOT used here: the first file input",
+    "on the page is the 'autofill from resume' uploader at the top of the form, and a",
+    "fallback would attach the resume to the wrong control.",
+    "EEO answers are radio groups named <uuid>__systemfield_eeoc_<x>, matched by suffix."
+  ],
   "detect": {
     "any": [
       "#ashby-application-form-container",
+      "input[name='_systemfield_name']",
       "[class*='ashby-application-form']",
-      "form[class*='ashby']",
-      "input[name='_systemfield_name']"
+      "form[class*='ashby']"
     ]
   },
   "meta": {
@@ -26,8 +36,8 @@
     ]
   },
   "submit": [
-    "button[type='submit']",
-    "[class*='ashby-application-form-submit-button']"
+    "[class*='ashby-application-form-submit-button']",
+    "button[type='submit']"
   ],
   "confirm": [
     "[class*='application-confirmation']",
@@ -72,9 +82,9 @@
     {
       "id": "resume_file",
       "selector": [
-        "input[name='_systemfield_resume']",
+        "input[type='file']#_systemfield_resume",
         "input[type='file'][id*='resume' i]",
-        "input[type='file']"
+        "input[type='file'][name='_systemfield_resume']"
       ]
     },
     {
@@ -96,6 +106,34 @@
       "selector": [
         "input[name*='website' i]",
         "input[name*='portfolio' i]"
+      ]
+    },
+    {
+      "id": "eeo_gender",
+      "selector": [
+        "input[type='radio'][name$='__systemfield_eeoc_gender']",
+        "select[name$='__systemfield_eeoc_gender']"
+      ]
+    },
+    {
+      "id": "eeo_race",
+      "selector": [
+        "input[type='radio'][name$='__systemfield_eeoc_race']",
+        "select[name$='__systemfield_eeoc_race']"
+      ]
+    },
+    {
+      "id": "eeo_veteran",
+      "selector": [
+        "input[type='radio'][name$='__systemfield_eeoc_veteran_status']",
+        "select[name$='__systemfield_eeoc_veteran_status']"
+      ]
+    },
+    {
+      "id": "eeo_disability",
+      "selector": [
+        "input[type='radio'][name$='__systemfield_eeoc_disability_status']",
+        "select[name$='__systemfield_eeoc_disability_status']"
       ]
     }
   ]

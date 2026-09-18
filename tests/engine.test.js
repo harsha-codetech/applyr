@@ -16,6 +16,7 @@ import assert from 'node:assert/strict';
 import { normalizeText, questionKey, similarity, looksYes } from '../src/core/util.js';
 import { defaultProfile, profileToValues, completeness, missingCoreFields } from '../src/core/schema.js';
 import { buildPlan } from '../src/content/resolver.js';
+import { isIgnored } from '../src/content/detector.js';
 import { matchOption } from '../src/content/adapters/choice.js';
 import { verifyEntry } from '../src/content/verify.js';
 import { OUTCOME } from '../src/core/messages.js';
@@ -280,6 +281,36 @@ test('file inputs only ever claim file fields', () => {
   const d = [desc({ kind: 'file', attrs: 'resume', label: 'Resume', accept: '.pdf' })];
   const plan = buildPlan(d, baseCtx({ values: { first_name: 'Ada' } }));
   assert.equal(plan[0].fieldId, 'resume_file');
+});
+
+// ---------------------------------------------------------------------------
+// detector guards
+// ---------------------------------------------------------------------------
+
+/** Minimal stand-in for a DOM element, enough for isIgnored(). */
+function fakeEl({ name = null, id = null, className = '', ariaHidden = null } = {}) {
+  const attrs = { name, id, 'aria-hidden': ariaHidden };
+  return { getAttribute: (k) => attrs[k] ?? null, className };
+}
+
+test('page machinery is never treated as a fillable field', () => {
+  // Greenhouse renders reCAPTCHA as a real <textarea>. Without this guard it
+  // looks like a perfectly good free-text answer and could be filled from
+  // question memory - on the form that decides whether you are a bot.
+  assert.ok(isIgnored(fakeEl({ name: 'g-recaptcha-response', id: 'g-recaptcha-response-100000' })));
+  assert.ok(isIgnored(fakeEl({ id: 'h-captcha-response' })));
+  assert.ok(isIgnored(fakeEl({ name: 'cf-turnstile-response' })));
+  assert.ok(isIgnored(fakeEl({ name: 'authenticity_token' })));
+  assert.ok(isIgnored(fakeEl({ name: 'csrf_token' })));
+  assert.ok(isIgnored(fakeEl({ className: 'honeypot-field' })));
+  assert.ok(isIgnored(fakeEl({ name: 'email', ariaHidden: 'true' })));
+});
+
+test('ordinary fields are not caught by the ignore guard', () => {
+  assert.ok(!isIgnored(fakeEl({ name: 'first_name', id: 'first_name' })));
+  assert.ok(!isIgnored(fakeEl({ name: 'job_application[email]' })));
+  assert.ok(!isIgnored(fakeEl({ id: 'resume', className: 'form-control' })));
+  assert.ok(!isIgnored(fakeEl({ name: 'urls[LinkedIn]' })));
 });
 
 // ---------------------------------------------------------------------------

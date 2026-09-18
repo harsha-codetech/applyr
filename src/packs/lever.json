@@ -6,7 +6,7 @@
     "lever.co",
     "hire.lever.co"
   ],
-  "verifiedAgainstLiveForm": null,
+  "verifiedAgainstLiveForm": "2026-09-18",
   "detect": {
     "any": [
       "form.application-form",
@@ -70,6 +70,20 @@
       "selector": [
         "input[name='org']",
         "#org"
+      ]
+    },
+    {
+      "id": "full_address",
+      "selector": [
+        "input[name='location']",
+        "#location"
+      ]
+    },
+    {
+      "id": "pronouns",
+      "selector": [
+        "input[type='radio'][name='pronouns']",
+        "input[name='customPronounsOption']"
       ]
     },
     {
@@ -144,5 +158,13 @@
         "[name='eeo[disability]']"
       ]
     }
+  ],
+  "notes": [
+    "Verified against a live posting: name, email, phone, org, all four urls[...] fields",
+    "and the resume input all resolved exactly. Confirmed additions: input[name=location].",
+    "The eeo[...] fields are optional per employer and were absent from the form checked;",
+    "their names are explicit enough that a miss is a no-op rather than a mis-fill.",
+    "Pronoun pickers appear as a radio group named pronouns on some forms - left to",
+    "generic mode, which maps it from the visible label."
   ]
 }

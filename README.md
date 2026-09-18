@@ -35,20 +35,23 @@ For a guided walkthrough with sample data, see [docs/DEMO.md](docs/DEMO.md).
 
 ## What works where
 
-**Bundled selector packs** (near-total coverage):
+**Bundled selector packs** (near-total coverage). Every pack has been checked
+against a real application form, with its selectors resolved read-only in the
+browser — no values were ever written to a live employer form:
 
-| Pack | Checked against a live application form |
+| Pack | Checked against |
 |---|---|
-| Workable | yes, 18 Sep 2026 |
-| SmartRecruiters | yes, 18 Sep 2026 |
-| Pinpoint | yes, 18 Sep 2026 |
-| JazzHR | yes, 18 Sep 2026 |
-| Lever | fixture only |
-| Greenhouse | fixture only |
-| Ashby | fixture only |
+| Lever | live posting, 18 Sep 2026 |
+| Greenhouse | live posting, 18 Sep 2026 |
+| Ashby | live posting, 18 Sep 2026 |
+| Workable | live posting, 18 Sep 2026 |
+| SmartRecruiters | live posting, 18 Sep 2026 |
+| Pinpoint | live posting, 18 Sep 2026 |
+| JazzHR | live posting, 18 Sep 2026 |
 
-Each pack carries a `verifiedAgainstLiveForm` date, so the ones still written
-from knowledge rather than from a real DOM are visible rather than implied.
+Each pack carries a `verifiedAgainstLiveForm` date, enforced by a test, so a
+pack written from guesswork cannot quietly pass as a checked one. ATSs redesign;
+re-check after any visible change to their forms.
 
 **Generic mode** (no pack, ~70–90% coverage): every other site. The resolver
 falls back to `autocomplete` tokens, name/id patterns and visible label text, so

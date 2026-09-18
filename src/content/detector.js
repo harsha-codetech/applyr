@@ -16,6 +16,26 @@ const SKIP_TYPES = new Set([
 /** Inputs whose presence usually means "this is a login box, not an application". */
 const AUTH_HINT = /(^|\W)(password|sign[\s_-]?in|log[\s_-]?in)(\W|$)/i;
 
+/**
+ * Controls that belong to the page's own machinery rather than to the
+ * application. Greenhouse, for one, renders reCAPTCHA as a real <textarea>,
+ * which would otherwise look like a perfectly good free-text answer field and
+ * could be filled from question memory.
+ */
+// "captcha" alone, so g-recaptcha-response, h-captcha-response and friends all match.
+const IGNORE_CONTROL = /captcha|turnstile|csrf|authenticity[_-]?token|honeypot|__RequestVerificationToken/i;
+
+export function isIgnored(el) {
+  const haystack = [
+    el.getAttribute('name'),
+    el.getAttribute('id'),
+    typeof el.className === 'string' ? el.className : ''
+  ].filter(Boolean).join(' ');
+  if (IGNORE_CONTROL.test(haystack)) return true;
+  if (el.getAttribute('aria-hidden') === 'true') return true;
+  return false;
+}
+
 let uidCounter = 0;
 function nextKey() {
   uidCounter += 1;
@@ -288,6 +308,7 @@ export function scan(root = document) {
   uidCounter = 0;
   const controls = deepQueryAll(root, (el) => {
     const tag = el.tagName;
+    if (isIgnored(el)) return false;
     if (tag === 'INPUT') return !SKIP_TYPES.has((el.type || 'text').toLowerCase());
     if (tag === 'SELECT' || tag === 'TEXTAREA') return true;
     if (el.isContentEditable && el.getAttribute('contenteditable') === 'true') return true;

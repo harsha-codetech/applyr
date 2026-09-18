@@ -29,6 +29,32 @@ Measured on the fixtures: Lever 8/8 fillable, Greenhouse 7/7 (+2 correctly
 withheld as demographic), hard-mode 8/8 across both wizard steps, unknown
 legacy form 11/12.
 
+## Live verification of wave-1 — done
+
+Lever, Greenhouse and Ashby were re-checked against real postings on 18 Sep 2026
+and all three needed fixes. Selector resolution was done read-only; nothing was
+written to a live employer form.
+
+- **Greenhouse had drifted a generation.** The modern board
+  (job-boards.greenhouse.io) drops `name` attributes entirely, uses bare ids, and
+  renders Country and every EEO question as `role=combobox` text inputs instead
+  of `<select>`. Every EEO selector in the old pack missed. Both generations are
+  now covered, modern selectors first.
+- **Ashby only has three real system fields.** Phone, location and the link
+  fields are per-employer custom fields named with a bare UUID and cannot be
+  packed at all — generic mode answers them from their labels. The resume input
+  has `id=_systemfield_resume` but no `name`, so the old selector missed. The
+  bare `input[type=file]` fallback was removed: the first file input on the page
+  is the autofill-from-resume uploader, so the fallback would have attached the
+  resume to the wrong control. EEO groups are radios suffixed
+  `__systemfield_eeoc_*` — including `_veteran_status` and `_disability_status`,
+  not the shorter names first assumed.
+- **Lever was accurate**; added the confirmed `location` field and the pronouns
+  radio group.
+- **Greenhouse renders reCAPTCHA as a real `<textarea>`.** The detector now
+  ignores captcha, CSRF, honeypot and `aria-hidden` controls, so question memory
+  can never be poured into the field that decides whether you are a bot.
+
 ## v1.1 — in progress
 
 - **Wave-2 packs — done for four of six.** Workable, SmartRecruiters, Pinpoint
