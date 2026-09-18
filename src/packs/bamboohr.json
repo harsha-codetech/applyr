@@ -1,0 +1,108 @@
+{
+  "id": "bamboohr",
+  "name": "BambooHR",
+  "match": [
+    "bamboohr.com"
+  ],
+  "verifiedAgainstLiveForm": "2026-09-18",
+  "notes": [
+    "The form is not in the page until 'Apply for This Job' is clicked; applyr's",
+    "MutationObserver picks it up when it appears.",
+    "Address parts are namespaced with a .value suffix (streetAddress.value, city.value,",
+    "state.value, zip.value, countryId.value). Screening questions are",
+    "customQuestionAnswers.short_<id> / .long_<id> and carry a per-posting id, so generic",
+    "mode answers them from their labels.",
+    "submit is deliberately empty: the Submit and Cancel buttons are BOTH type=submit,",
+    "so a selector would log a false submission when the user cancels. The content",
+    "script's button-text heuristic recognises 'Submit Application' and ignores Cancel.",
+    "This form also carries a honeypot (nickname_hpcsaf, labelled 'Please leave this",
+    "field blank') which is fully visible and would otherwise match preferred_name - see",
+    "isIgnored() in content/detector.js."
+  ],
+  "detect": {
+    "any": [
+      "#job-application-form",
+      "input[name='streetAddress.value']",
+      "input[name='linkedinUrl'][id='linkedinUrl']"
+    ]
+  },
+  "meta": {
+    "company": [
+      "meta[property='og:site_name']",
+      "[class*='company-name']"
+    ],
+    "role": [
+      "h1",
+      "meta[property='og:title']"
+    ]
+  },
+  "submit": [],
+  "confirm": [
+    "[class*='application-confirmation']",
+    "[class*='thank-you']"
+  ],
+  "widgets": {
+    "combobox": {
+      "trigger": "[role='combobox'], button[class*='fab-select'], [class*='fabric-select']",
+      "option": "[role='option'], [class*='fab-menu-option']"
+    }
+  },
+  "fields": [
+    {
+      "id": "first_name",
+      "selector": ["#job-application-form input[name='firstName']", "#firstName"]
+    },
+    {
+      "id": "last_name",
+      "selector": ["#job-application-form input[name='lastName']", "#lastName"]
+    },
+    {
+      "id": "email",
+      "selector": ["#job-application-form input[name='email']", "#email"]
+    },
+    {
+      "id": "phone",
+      "selector": ["#job-application-form input[name='phone']", "#phone"]
+    },
+    {
+      "id": "address_line1",
+      "selector": ["input[name='streetAddress.value']"]
+    },
+    {
+      "id": "city",
+      "selector": ["input[name='city.value']"]
+    },
+    {
+      "id": "state",
+      "selector": ["input[name='state.value']"]
+    },
+    {
+      "id": "postal_code",
+      "selector": ["input[name='zip.value']"]
+    },
+    {
+      "id": "country",
+      "selector": ["select[name='countryId.value']"]
+    },
+    {
+      "id": "resume_file",
+      "selector": ["#job-application-form input[type='file']"]
+    },
+    {
+      "id": "desired_salary",
+      "selector": ["#job-application-form input[name='desiredPay']", "#desiredPay"]
+    },
+    {
+      "id": "portfolio_url",
+      "selector": ["#job-application-form input[name='websiteUrl']", "#websiteUrl"]
+    },
+    {
+      "id": "linkedin_url",
+      "selector": ["#job-application-form input[name='linkedinUrl']", "#linkedinUrl"]
+    },
+    {
+      "id": "degree",
+      "selector": ["select[name='educationLevelId']", "#educationLevelId"]
+    }
+  ]
+}

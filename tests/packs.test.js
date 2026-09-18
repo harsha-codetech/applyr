@@ -142,7 +142,7 @@ test('the bundled packs cover the wave-1 and wave-2 ATSs', () => {
   const ids = packs.map((p) => p.json.id).sort();
   for (const expected of [
     'ashby', 'greenhouse', 'lever',
-    'jazzhr', 'pinpoint', 'smartrecruiters', 'workable'
+    'bamboohr', 'jazzhr', 'pinpoint', 'recruitee', 'smartrecruiters', 'workable'
   ]) {
     assert.ok(ids.includes(expected), `missing pack: ${expected}`);
   }

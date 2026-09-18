@@ -48,6 +48,8 @@ browser — no values were ever written to a live employer form:
 | SmartRecruiters | live posting, 18 Sep 2026 |
 | Pinpoint | live posting, 18 Sep 2026 |
 | JazzHR | live posting, 18 Sep 2026 |
+| Recruitee | live posting, 18 Sep 2026 |
+| BambooHR | live posting, 18 Sep 2026 |
 
 Each pack carries a `verifiedAgainstLiveForm` date, enforced by a test, so a
 pack written from guesswork cannot quietly pass as a checked one. ATSs redesign;
@@ -58,8 +60,8 @@ falls back to `autocomplete` tokens, name/id patterns and visible label text, so
 an unknown ATS still fills most of the form. Verified against the legacy-style
 fixture at 92%.
 
-Manifest-declared hosts also include Recruitee, BambooHR, Teamtailor, Breezy,
-Workday and iCIMS — those run in generic mode until a pack is written for them.
+Manifest-declared hosts also include Teamtailor, Breezy, Workday and iCIMS —
+those run in generic mode until a pack is written for them.
 
 ## Develop
 

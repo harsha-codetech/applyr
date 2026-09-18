@@ -310,9 +310,19 @@ test('a file field that already holds a document is left alone', () => {
 // ---------------------------------------------------------------------------
 
 /** Minimal stand-in for a DOM element, enough for isIgnored(). */
-function fakeEl({ name = null, id = null, className = '', ariaHidden = null } = {}) {
-  const attrs = { name, id, 'aria-hidden': ariaHidden };
-  return { getAttribute: (k) => attrs[k] ?? null, className };
+function fakeEl({
+  name = null, id = null, className = '', ariaHidden = null,
+  ariaLabel = null, placeholder = null, tabindex = null, label = null
+} = {}) {
+  const attrs = {
+    name, id, 'aria-hidden': ariaHidden, 'aria-label': ariaLabel,
+    placeholder, tabindex
+  };
+  return {
+    getAttribute: (k) => attrs[k] ?? null,
+    className,
+    labels: label ? [{ textContent: label }] : []
+  };
 }
 
 test('page machinery is never treated as a fillable field', () => {
@@ -326,6 +336,30 @@ test('page machinery is never treated as a fillable field', () => {
   assert.ok(isIgnored(fakeEl({ name: 'csrf_token' })));
   assert.ok(isIgnored(fakeEl({ className: 'honeypot-field' })));
   assert.ok(isIgnored(fakeEl({ name: 'email', ariaHidden: 'true' })));
+});
+
+test('honeypots are never filled', () => {
+  // BambooHR's real one: a fully visible 214x28 input, opacity 1, that would have
+  // matched the taxonomy's preferred_name pattern via "nickname".
+  assert.ok(isIgnored(fakeEl({
+    name: 'nickname_hpcsaf', id: 'nickname_hpcsaf',
+    label: 'Please leave this field blank', tabindex: '-1'
+  })), 'BambooHR honeypot must be ignored');
+
+  // Each signal should stand on its own.
+  assert.ok(isIgnored(fakeEl({ name: 'nickname_hpabc123' })), 'hp-suffixed name');
+  assert.ok(isIgnored(fakeEl({ name: 'yourname', label: 'Please leave this field blank' })), 'leave-blank label');
+  assert.ok(isIgnored(fakeEl({ name: 'yourname', ariaLabel: 'Do not fill this in' })), 'do-not-fill aria-label');
+  assert.ok(isIgnored(fakeEl({ name: 'email2', placeholder: 'Leave blank' })), 'leave-blank placeholder');
+});
+
+test('tabindex=-1 alone does not disqualify a field', () => {
+  // On the same BambooHR form that carries the honeypot, the real Country and
+  // Highest Education selects are tabindex="-1" because they sit behind custom
+  // widgets, and Greenhouse marks its combobox inner inputs the same way.
+  // Treating it as a honeypot signal silently dropped real fields.
+  assert.ok(!isIgnored(fakeEl({ name: 'countryId.value', tabindex: '-1', label: 'Country *' })));
+  assert.ok(!isIgnored(fakeEl({ name: 'educationLevelId', tabindex: '-1', label: 'Highest Education Obtained *' })));
 });
 
 test('ordinary fields are not caught by the ignore guard', () => {

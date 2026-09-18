@@ -415,6 +415,19 @@ async function main() {
     check('generic mode fills an unknown ATS', pct >= 70,
       `${pct}% (${gfill?.counts?.filled}/${gfill?.counts?.total})`);
 
+    // The fixture carries a real BambooHR honeypot: visible, normal-sized, and
+    // named so that it matches the taxonomy's preferred_name pattern. Filling it
+    // tells the employer a bot submitted the application.
+    const honeypot = await cdp.evaluate(gpage, `
+      const el = document.getElementById('nickname_hpcsaf');
+      return { value: el ? el.value : null, seen: (window.__x = 0, true) };
+    `);
+    check('honeypot left empty', honeypot.value === '',
+      honeypot.value === '' ? 'untouched' : `FILLED WITH "${honeypot.value}"`);
+    check('honeypot never entered the fill plan',
+      !(gfill.results || []).some((r) => /nickname|leave this field blank/i.test(`${r.label} ${r.key}`)),
+      `${gfill?.counts?.total} fields planned, honeypot excluded`);
+
     // 9. service worker survives a restart ----------------------------------
     console.log('\n--- worker lifecycle ---');
     const persisted = await cdp.evaluate(sw, `

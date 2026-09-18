@@ -1,0 +1,89 @@
+{
+  "id": "recruitee",
+  "name": "Recruitee",
+  "match": [
+    "recruitee.com"
+  ],
+  "verifiedAgainstLiveForm": "2026-09-18",
+  "notes": [
+    "The application lives at /o/<slug>/c/new, not on the posting page itself.",
+    "Every field is namespaced candidate.* and EEO answers are radio groups named",
+    "eeo.<attribute>. Screening questions are candidate.openQuestionAnswers.<id>.content",
+    "for free text and .flag for yes/no, so they carry a per-posting id and cannot be",
+    "packed - generic mode answers them from their labels.",
+    "The phone field has its own country-code button next to it; applyr fills only the",
+    "number and leaves the country picker alone."
+  ],
+  "detect": {
+    "any": [
+      "#offer-application-form",
+      "input[name='candidate.name']",
+      "input[name='candidate.cv']"
+    ]
+  },
+  "meta": {
+    "company": [
+      "meta[property='og:site_name']",
+      "[class*='company-name']"
+    ],
+    "role": [
+      "h1",
+      "meta[property='og:title']"
+    ]
+  },
+  "submit": [
+    "#offer-application-form button[type='submit']"
+  ],
+  "confirm": [
+    "[class*='application-confirmation']",
+    "[class*='thank-you']"
+  ],
+  "widgets": {
+    "combobox": {
+      "trigger": "[role='combobox'], [class*='select']",
+      "option": "[role='option']"
+    }
+  },
+  "fields": [
+    {
+      "id": "full_name",
+      "selector": ["input[name='candidate.name']"]
+    },
+    {
+      "id": "email",
+      "selector": ["input[name='candidate.email']"]
+    },
+    {
+      "id": "phone",
+      "selector": ["input[name='candidate.phone']"]
+    },
+    {
+      "id": "resume_file",
+      "selector": ["input[type='file'][name='candidate.cv']"]
+    },
+    {
+      "id": "cover_letter_file",
+      "selector": ["input[type='file'][name='candidate.coverLetterFile']"]
+    },
+    {
+      "id": "cover_letter_text",
+      "selector": ["textarea[name='candidate.coverLetter']"]
+    },
+    {
+      "id": "eeo_gender",
+      "selector": ["input[name='eeo.gender']", "select[name='eeo.gender']"]
+    },
+    {
+      "id": "eeo_race",
+      "selector": ["input[name='eeo.race']", "select[name='eeo.race']"]
+    },
+    {
+      "id": "eeo_veteran",
+      "selector": ["input[name='eeo.veteranStatus']", "select[name='eeo.veteranStatus']"]
+    },
+    {
+      "id": "eeo_disability",
+      "selector": ["input[name^='eeo.disab']", "select[name^='eeo.disab']"]
+    }
+  ]
+}

@@ -22,8 +22,20 @@ const AUTH_HINT = /(^|\W)(password|sign[\s_-]?in|log[\s_-]?in)(\W|$)/i;
  * which would otherwise look like a perfectly good free-text answer field and
  * could be filled from question memory.
  */
-// "captcha" alone, so g-recaptcha-response, h-captcha-response and friends all match.
-const IGNORE_CONTROL = /captcha|turnstile|csrf|authenticity[_-]?token|honeypot|__RequestVerificationToken/i;
+// "captcha" alone, so g-recaptcha-response, h-captcha-response and friends all
+// match. The trailing pattern catches honeypots named like BambooHR's
+// `nickname_hpcsaf` - an "hp" segment plus a random suffix.
+const IGNORE_CONTROL = /captcha|turnstile|csrf|authenticity[_-]?token|honeypot|__RequestVerificationToken|(^|[_-])hp[a-z0-9]{0,10}$/i;
+
+/**
+ * Honeypots announce themselves to screen readers while staying invisible to
+ * sighted users. BambooHR's is the instructive case: a fully visible 214x28
+ * input, opacity 1, labelled "Please leave this field blank" and marked
+ * tabindex="-1". Nothing about its geometry gives it away, and its name
+ * (`nickname_hpcsaf`) matches the taxonomy's `preferred_name` pattern - so
+ * filling it was one regex away from flagging a real application as a bot.
+ */
+const LEAVE_BLANK = /leave\s+(this\s+)?(field\s+)?(blank|empty)|do\s+not\s+(fill|complete|enter)|anti-?spam/i;
 
 export function isIgnored(el) {
   const haystack = [
@@ -33,6 +45,22 @@ export function isIgnored(el) {
   ].filter(Boolean).join(' ');
   if (IGNORE_CONTROL.test(haystack)) return true;
   if (el.getAttribute('aria-hidden') === 'true') return true;
+
+  const hint = [
+    el.getAttribute('aria-label'),
+    el.getAttribute('placeholder'),
+    el.labels && el.labels[0] ? el.labels[0].textContent : ''
+  ].filter(Boolean).join(' ');
+  if (LEAVE_BLANK.test(hint)) return true;
+
+  // `tabindex="-1"` is deliberately NOT treated as a honeypot signal on its own.
+  // It looks like one, but on the same BambooHR form that carries the honeypot,
+  // the real Country and Highest Education selects are also tabindex="-1"
+  // (they sit behind custom widgets), and Greenhouse marks the inner inputs of
+  // its comboboxes the same way. Excluding on that alone silently dropped real
+  // fields. The name pattern and the "leave blank" label each catch the honeypot
+  // by themselves, so the weaker signal buys nothing and costs real coverage.
+
   return false;
 }
 

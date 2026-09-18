@@ -79,6 +79,39 @@ written to a live employer form.
   ignores captcha, CSRF, honeypot and `aria-hidden` controls, so question memory
   can never be poured into the field that decides whether you are a bot.
 
+## Wave-2 packs — complete
+
+Recruitee and BambooHR, the two deferred for want of a live form, are done. All
+nine packs are now checked against a real application form.
+
+- **Recruitee** — the form lives at `/o/<slug>/c/new`, not on the posting page.
+  Everything is namespaced `candidate.*`, EEO answers are radio groups named
+  `eeo.<attribute>`, and screening questions carry a per-posting id. 9/9 hit.
+- **BambooHR** — the form does not exist until "Apply for This Job" is clicked;
+  the MutationObserver picks it up. Address parts use a `.value` suffix. 14/14
+  hit. Its Submit and Cancel buttons are *both* `type=submit`, so the pack ships
+  an empty `submit` list and relies on the button-text heuristic — a selector
+  there would have logged a submission every time someone cancelled.
+
+### The honeypot
+
+The BambooHR form carries a honeypot named `nickname_hpcsaf`, labelled "Please
+leave this field blank". It is **fully visible** — 214x28 pixels, opacity 1, no
+`display:none` — so nothing about its geometry gives it away, and "nickname"
+matches the taxonomy's `preferred_name` pattern. applyr would have filled it and
+told the employer a bot submitted the application.
+
+The detector now ignores controls whose name matches a honeypot suffix pattern
+or whose label says to leave them blank. A copy of the real field is in
+`fixtures/generic-unknown.html`, and the e2e asserts it stays empty and never
+enters the fill plan.
+
+The first version of that fix also excluded every `tabindex="-1"` control, which
+looked like a strong signal and was not: on the same BambooHR form the real
+Country and Highest Education selects are `tabindex="-1"` because they sit
+behind custom widgets, and Greenhouse marks its combobox inner inputs the same
+way. It was dropped, with a test pinning the decision.
+
 ## v1.1 — in progress
 
 - **Wave-2 packs — done for four of six.** Workable, SmartRecruiters, Pinpoint
