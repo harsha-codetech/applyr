@@ -77,6 +77,14 @@ function stageExtension() {
   mf.host_permissions.push(origin);
   mf.content_scripts[0].matches.push(origin);
   fs.writeFileSync(mfPath, JSON.stringify(mf, null, 2));
+
+  // The Naukri board profile matches on host, so the fixture origin is added to
+  // it too - same reasoning as the manifest above.
+  const boardPath = path.join(dir, 'src/boards/naukri.json');
+  const board = JSON.parse(fs.readFileSync(boardPath, 'utf8'));
+  board.match.push('localhost');
+  fs.writeFileSync(boardPath, JSON.stringify(board, null, 2));
+
   return dir;
 }
 
@@ -300,7 +308,7 @@ async function main() {
         title: document.title
       };
     `);
-    check('panel renders its navigation', panelState.tabs === 6, `${panelState.tabs} tabs`);
+    check('panel renders its navigation', panelState.tabs === 7, `${panelState.tabs} tabs`);
     check('message router answers get-state from the panel',
       await cdp.evaluate(panel, 'const r = await chrome.runtime.sendMessage({type:"get-state"}); return Boolean(r && r.ok && r.profile && r.files.length === 1);'));
 
@@ -491,7 +499,57 @@ async function main() {
       wdDom.month === '11' && wdDom.day === '02' && wdDom.year === '2026',
       `${wdDom.month}/${wdDom.day}/${wdDom.year}`);
 
-    // 10. service worker survives a restart ---------------------------------
+    // 10. assisted mode on a job board --------------------------------------
+    console.log('\n--- assisted mode ---');
+    const board = `${FIXTURE_ORIGIN}/fixtures/naukri-like.html`;
+    const { targetId: bId } = await cdp.send('Target.createTarget', { url: board });
+    const { sessionId: bPage } = await cdp.send('Target.attachToTarget', { targetId: bId, flatten: true });
+    await cdp.send('Runtime.enable', {}, bPage);
+    await sleep(2200);
+
+    const boardScan = await cdp.evaluate(sw, `
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(t => t.url && t.url.includes('naukri-like'));
+      return await chrome.tabs.sendMessage(tab.id, { type: 'scan' });
+    `);
+    check('board recognised', Boolean(boardScan && boardScan.board),
+      boardScan && boardScan.board ? boardScan.board.name : 'no board profile matched');
+    check('listings extracted from the page',
+      Boolean(boardScan && boardScan.listings && boardScan.listings.length === 4),
+      `${boardScan?.listings?.length ?? 0} listings`);
+
+    const first = (boardScan.listings || [])[0] || {};
+    check('listing fields parsed',
+      first.title === 'Senior Platform Engineer - Payments'
+        && first.company === 'Meridian Systems'
+        && first.experience === '5-9 Yrs'
+        && first.skills.length === 5,
+      `${first.title} @ ${first.company} (${first.experience}, ${first.skills?.length} skills)`);
+
+    // Ranking runs in the panel, using the very modules imported here. (Both are
+    // pure, so they can be pulled into Node directly - the worker only hands
+    // over the stored profile. A dynamic import inside the worker would fail:
+    // that is disallowed in a service worker, which is how the broken export
+    // path was found earlier.)
+    const { rankListings } = await import('../src/core/matching.js');
+    const { profileToValues } = await import('../src/core/schema.js');
+    const rawProfile = await cdp.evaluate(sw, 'return await globalThis.__applyr.store.getProfile();');
+    const profileValues = Object.fromEntries(profileToValues(rawProfile));
+    const ranked = rankListings(boardScan.listings || [], profileValues);
+    check('relevant jobs rank above irrelevant ones',
+      /Platform Engineer|Backend Engineer/.test(ranked[0].title)
+        && /Trainee|Sales/.test(ranked[3].title),
+      ranked.map((r) => `${r.title.slice(0, 22)}=${Math.round(r.match.score * 100)}`).join(', '));
+
+    // Assisted mode must stay read-only: a board page is not an application.
+    check('board page is not treated as an application',
+      boardScan.isApplication === false && boardScan.fieldCount === 0,
+      `isApplication=${boardScan.isApplication}, ${boardScan.fieldCount} fields`);
+
+    const noNav = await cdp.evaluate(bPage, 'return location.href;');
+    check('applyr did not navigate the board page', noNav.includes('naukri-like.html'), noNav.slice(-28));
+
+    // 11. service worker survives a restart ---------------------------------
     console.log('\n--- worker lifecycle ---');
     const persisted = await cdp.evaluate(sw, `
       const p = await globalThis.__applyr.store.getProfile();

@@ -10,6 +10,8 @@
 import { MSG, OUTCOME } from '../core/messages.js';
 import { pickPack, packFieldRules, packWidgets, packMetaSelectors, packSubmitSelectors, packConfirmSelectors } from '../core/packs.js';
 import { scan, looksLikeApplication, deepQueryAll, isVisible } from './detector.js';
+import { pickBoard } from '../core/boards.js';
+import { extractListings, extractDetail } from './listings.js';
 import { buildPlan } from './resolver.js';
 import { applyEntry } from './adapters/index.js';
 import * as overlay from './overlay.js';
@@ -23,6 +25,8 @@ const state = {
   scanning: false,
   filling: false,
   meta: null,
+  board: null,
+  boardChecked: false,
   submitWatched: false
 };
 
@@ -102,6 +106,21 @@ async function doScan({ announce = true } = {}) {
     const isApp = looksLikeApplication(state.descriptors, document);
     state.meta = readMeta();
 
+    // Assisted mode: if this host is a job board we know how to read, parse the
+    // cards that are already on screen. Read-only - see content/listings.js.
+    if (!state.boardChecked) {
+      state.boardChecked = true;
+      state.board = await pickBoard(location.href);
+    }
+    let listings = [];
+    if (state.board) {
+      listings = extractListings(state.board, document);
+      if (!listings.length) {
+        const one = extractDetail(state.board, document);
+        if (one) listings = [one];
+      }
+    }
+
     const payload = {
       type: MSG.SCAN_RESULT,
       frameUrl: location.href,
@@ -111,7 +130,9 @@ async function doScan({ announce = true } = {}) {
       packName: state.pack ? state.pack.name : 'Generic mode',
       via: state.via,
       meta: state.meta,
-      step: readStep()
+      step: readStep(),
+      board: state.board ? { id: state.board.id, name: state.board.name } : null,
+      listings
     };
     if (announce) safeSend(payload);
     if (isApp) watchSubmit();

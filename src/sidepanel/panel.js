@@ -6,6 +6,7 @@ import * as fillView from './views/fill.js';
 import * as profileView from './views/profile.js';
 import * as documentsView from './views/documents.js';
 import * as memoryView from './views/memory.js';
+import * as matchesView from './views/matches.js';
 import * as applicationsView from './views/applications.js';
 import * as settingsView from './views/settings.js';
 
@@ -13,6 +14,7 @@ const VIEWS = [
   { id: 'fill', label: 'This page', mod: fillView },
   { id: 'profile', label: 'Profile', mod: profileView },
   { id: 'documents', label: 'Documents', mod: documentsView },
+  { id: 'matches', label: 'Matches', mod: matchesView },
   { id: 'memory', label: 'Answers', mod: memoryView },
   { id: 'applications', label: 'Applications', mod: applicationsView },
   { id: 'settings', label: 'Settings', mod: settingsView }

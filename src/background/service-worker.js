@@ -204,7 +204,9 @@ async function handle(msg, sender) {
         packName: msg.packName,
         via: msg.via,
         meta: msg.meta,
-        step: msg.step
+        step: msg.step,
+        board: msg.board,
+        listings: msg.listings
       });
       return { ok: true };
     }

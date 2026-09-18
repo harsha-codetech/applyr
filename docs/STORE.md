@@ -57,6 +57,7 @@ the extension does anything else.
 | `scripting` | Registers the content script on sites the user has explicitly granted access to at runtime. |
 | `tabs` | Reads the active tab's URL so the panel can show whether applyr is running on that page and offer per-site access. |
 | Host permissions (listed ATS domains) | The content script must read form fields and their labels on application pages in order to fill them. Each listed domain is an applicant-tracking system that hosts job applications. |
+| `*://*.naukri.com/*` | Assisted mode reads the job cards already rendered on a search page the user opened, so the side panel can rank them against the user's profile. It is read-only: no navigation, no requests, no form submission on that domain. |
 | `*://*/*` (optional) | Not granted at install. Requested per-site, from a user click in the panel, only when the user wants applyr on a career site not covered above. |
 
 ## Data-safety declaration

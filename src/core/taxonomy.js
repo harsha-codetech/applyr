@@ -170,6 +170,11 @@ export const FIELDS = [
     attr: [/current[_\-]?(salary|ctc)/i], text: [/current\s*(salary|ctc|compensation)/i]
   },
   {
+    id: 'skills', label: 'Skills (comma separated)', group: 'work', type: 'longtext',
+    attr: [/^skills?$/i, /key[_\-]?skills/i, /technical[_\-]?skills/i],
+    text: [/^\s*(key |technical |core )?skills\s*\*?$/i, /areas of expertise/i]
+  },
+  {
     id: 'notice_period', label: 'Notice period', group: 'work', type: 'text',
     attr: [/notice[_\-]?period/i], text: [/notice\s*period/i, /how\s*soon.*(join|start)/i]
   },

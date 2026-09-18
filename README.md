@@ -75,10 +75,29 @@ some of them on your first real application. The pack records this as
 applyr also refuses outright to fill any page containing a password field, which
 is what Workday’s step 1 is.
 
+## Assisted mode (job boards)
+
+On a supported job board, the **Matches** tab ranks the job cards already on the
+page against your profile — skills overlap, experience fit, location, title
+similarity — and shows why each one scored as it did.
+
+Supported: **Naukri**.
+
+What it does **not** do, by design:
+
+- no searching, paginating, or opening pages on your behalf
+- no background crawling; it reads only the page you are looking at, when you
+  look at it
+- no applying through the board — open a posting yourself, and where it leads to
+  the employer's own form, the normal packs fill that
+
+The scoring is local arithmetic over your profile, not a model, and it exists to
+reorder what is in front of you. It never decides anything.
+
 ## Develop
 
 ```bash
-npm test          # 51 engine tests, no dependencies
+npm test          # 61 engine tests, no dependencies
 npm run serve     # fixtures at http://localhost:5173/fixtures/
 npm run e2e       # loads the extension into real Chrome and drives it over CDP
 npm run zip       # dist/applyr-<version>.zip for the Web Store
@@ -125,6 +144,10 @@ applyr does not automate job boards, does not click Submit, does not rotate
 fingerprints, and does not evade bot detection. It runs in your own browser, in
 your own session, at the speed you work.
 
+Assisted mode does not change that. It reads the page you opened and reorders
+what is on it. It issues no requests, follows no links, and applies to nothing —
+the boundary is that applyr never generates activity you did not.
+
 That is a deliberate boundary and it is also the practical one: on a logged-in
 account the platform already knows who you are, so spoofing a fingerprint
 changes nothing about detection while inconsistency across sessions is itself a
@@ -155,7 +178,8 @@ src/core/              taxonomy, profile schema, storage, packs, messages
 src/content/           detector → resolver → adapters → verify, plus the in-page HUD
 src/background/        service worker: storage owner and message router
 src/sidepanel/         profile editor, fill controls, answers, tracker, settings
-src/packs/             per-ATS selector packs (JSON)
+src/packs/             per-ATS selector packs (JSON, describe how to fill)
+src/boards/            per-board read profiles (JSON, describe how to read)
 fixtures/              offline test pages
 tests/                 node:test engine suite
 ```
@@ -163,8 +187,8 @@ tests/                 node:test engine suite
 ## Status
 
 v1 is complete and verified in a real Chrome: engine, generic mode, ten packs,
-question memory, document vault, tracker, and a Web Store package. 51 unit tests
-and 32 end-to-end checks pass.
+assisted mode, question memory, document vault, tracker, and a Web Store
+package. 61 unit tests and 38 end-to-end checks pass.
 
 What has not happened yet: a real application submitted through it. Workday's
 form steps in particular have never been seen by this code. See

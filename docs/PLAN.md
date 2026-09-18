@@ -79,6 +79,35 @@ written to a live employer form.
   ignores captcha, CSRF, honeypot and `aria-hidden` controls, so question memory
   can never be poured into the field that decides whether you are a bot.
 
+## Naukri assisted mode — done
+
+Read-only, exactly as scoped. Selectors confirmed against a live Naukri search
+page on 18 Sep 2026: `.srp-jobtuple-wrapper[data-job-id]` cards with `a.title`,
+`a.comp-name`, `.expwdth`, `.locWdth`, `.sal-wrap`, `.tag-li`, `.job-post-day` —
+20 cards per page, every field resolving.
+
+New concepts:
+
+- **Board profiles** (`src/boards/*.json`) — the read-only counterpart to packs.
+  A pack says how to *fill* a form; a board profile says how to *read* the cards
+  on a listings page. They are kept apart deliberately: nothing in a board
+  profile can cause a write, and nothing in it describes navigation.
+- **`src/core/matching.js`** — local scoring, no model: skills overlap (0.45),
+  experience fit (0.30), location (0.15), title similarity (0.10). Every score
+  carries its reasons so the panel can explain itself and the user can disagree.
+  Missing profile data degrades to neutral rather than zero — an empty profile
+  makes jobs *unknown*, not bad.
+- **`skills` in the taxonomy** — needed for scoring, and it fills ATS skills
+  fields too.
+
+The boundary, enforced by the e2e: the board page is never treated as an
+application, nothing is written to it, and applyr does not navigate it. It reads
+what the user is looking at and reorders it. There is no code path that visits a
+URL the user did not.
+
+Not done and not planned: applying through Naukri. Where a listing leads to the
+employer's own ATS, the normal packs take over there.
+
 ## Workday — engine done, pack partially verified
 
 Workday is not like the others, and the honest summary is that the machinery is

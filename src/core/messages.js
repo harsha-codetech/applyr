@@ -9,9 +9,11 @@ export const MSG = {
   LEARN_ANSWER: 'learn-answer',
   SUBMIT_DETECTED: 'submit-detected',
   PAGE_META: 'page-meta',
+  LISTINGS_FOUND: 'listings-found',
 
   // background/panel -> content
   SCAN: 'scan',
+  SCAN_LISTINGS: 'scan-listings',
   FILL: 'fill',
   FILL_ONE: 'fill-one',
   HIGHLIGHT: 'highlight',

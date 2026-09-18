@@ -62,6 +62,18 @@ history entry, one education entry, and a résumé PDF under **Documents**.
 - [ ] "Willing to relocate?" select resolves `yes` to the option value `Y`
 - [ ] Anything unresolved offers **Teach answer** in the HUD
 
+## 4b. `naukri-like.html` — assisted mode
+
+- [ ] The **Matches** tab lists all four jobs with scores
+- [ ] The two engineering roles rank above the trainee and sales roles
+- [ ] Each row explains itself (“4 of 5 skills match”, “caps at 2 yrs”)
+- [ ] Clear your skills in Profile → Work; scores flatten and a prompt appears
+- [ ] **This page** still says *no form found* — a board is not an application
+- [ ] Nothing on the page is filled, highlighted or clicked
+
+On the real Naukri, confirm the same and confirm applyr never changes the page,
+never advances pagination, and never opens a posting you did not click.
+
 ## 5. Cross-cutting
 
 - [ ] `Alt+Shift+F` fills without opening the panel

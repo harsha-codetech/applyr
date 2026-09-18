@@ -1,0 +1,42 @@
+{
+  "id": "naukri",
+  "name": "Naukri",
+  "match": ["naukri.com"],
+  "verifiedAgainstLiveSite": "2026-09-18",
+  "notes": [
+    "Read-only. This profile describes how to READ the job cards already on the",
+    "page the user opened - nothing here navigates, paginates, searches or applies.",
+    "Selectors confirmed against a live search results page on 18 Sep 2026 across",
+    "four cards: 20 cards per page, every field below resolved.",
+    "Salary is absent from most cards because 'Not disclosed' is not rendered.",
+    "applyr does not apply through Naukri. Where a listing leads to an employer's",
+    "own ATS ('Apply on company site'), the normal packs take over on that page."
+  ],
+  "listing": {
+    "card": ".srp-jobtuple-wrapper",
+    "id": "data-job-id",
+    "fields": {
+      "title": "a.title",
+      "url": "a.title",
+      "company": "a.comp-name",
+      "location": ".locWdth",
+      "experience": ".expwdth",
+      "salary": ".sal-wrap",
+      "description": ".job-desc",
+      "posted": ".job-post-day",
+      "rating": ".main-2"
+    },
+    "skills": ".tag-li"
+  },
+  "detail": {
+    "container": ".styles_job-header-container__tuSqe, .jd-header",
+    "fields": {
+      "title": ".styles_jd-header-title__rZwM1, h1",
+      "company": ".styles_jd-header-comp-name__MvqAI a, .jd-header-comp-name",
+      "location": ".styles_jhc__location__W_pVs, .loc",
+      "experience": ".styles_jhc__exp__k_giM",
+      "salary": ".styles_jhc__salary__jdfEC"
+    },
+    "applyExternal": ".styles_company-site-button__C_2YK, a[href*='outbound']"
+  }
+}

@@ -10,8 +10,16 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["storage", "unlimitedStorage", "sidePanel", "scripting", "tabs"],
-  "optional_host_permissions": ["*://*/*"],
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "sidePanel",
+    "scripting",
+    "tabs"
+  ],
+  "optional_host_permissions": [
+    "*://*/*"
+  ],
   "host_permissions": [
     "*://jobs.lever.co/*",
     "*://boards.greenhouse.io/*",
@@ -28,7 +36,8 @@
     "*://*.teamtailor.com/*",
     "*://*.breezy.hr/*",
     "*://*.myworkdayjobs.com/*",
-    "*://*.icims.com/*"
+    "*://*.icims.com/*",
+    "*://*.naukri.com/*"
   ],
   "background": {
     "service_worker": "src/background/service-worker.js",
@@ -62,10 +71,15 @@
         "*://*.teamtailor.com/*",
         "*://*.breezy.hr/*",
         "*://*.myworkdayjobs.com/*",
-        "*://*.icims.com/*"
+        "*://*.icims.com/*",
+        "*://*.naukri.com/*"
       ],
-      "js": ["src/content/loader.js"],
-      "css": ["src/content/overlay.css"],
+      "js": [
+        "src/content/loader.js"
+      ],
+      "css": [
+        "src/content/overlay.css"
+      ],
       "all_frames": true,
       "run_at": "document_idle"
     }
@@ -76,14 +90,19 @@
         "src/content/*.js",
         "src/content/adapters/*.js",
         "src/core/*.js",
-        "src/packs/*.json"
+        "src/packs/*.json",
+        "src/boards/*.json"
       ],
-      "matches": ["*://*/*"]
+      "matches": [
+        "*://*/*"
+      ]
     }
   ],
   "commands": {
     "fill-page": {
-      "suggested_key": { "default": "Alt+Shift+F" },
+      "suggested_key": {
+        "default": "Alt+Shift+F"
+      },
       "description": "Fill the application form on this page"
     }
   }
