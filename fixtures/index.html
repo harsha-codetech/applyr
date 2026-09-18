@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>applyr fixtures</title>
+    <style>
+      body { font: 15px/1.6 system-ui, sans-serif; max-width: 640px; margin: 48px auto; padding: 0 20px; }
+      a.card { display: block; border: 1px solid #ddd; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; text-decoration: none; color: inherit; }
+      a.card:hover { border-color: #2f6fed; }
+      a.card b { display: block; }
+      code { background: #f4f4f5; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <h1>applyr fixtures</h1>
+    <p>
+      Offline stand-ins for the real boards, so the fill engine can be exercised
+      without sending anything to a real employer. Serve them over HTTP with
+      <code>npm run serve</code>, then grant applyr access to
+      <code>http://localhost:5173</code> from the side panel.
+    </p>
+
+    <a class="card" href="lever-like.html">
+      <b>Lever-like</b>
+      Single full-name field, bracketed <code>urls[LinkedIn]</code> names, plain file input.
+    </a>
+    <a class="card" href="greenhouse-like.html">
+      <b>Greenhouse-like</b>
+      Stable ids, radio groups for work authorisation, EEO selects, react-select combobox.
+    </a>
+    <a class="card" href="hard-mode.html">
+      <b>Hard mode</b>
+      Controlled input that reverts naive writes, a field in a shadow root, a portalled
+      listbox, and a second wizard step created on demand.
+    </a>
+    <a class="card" href="generic-unknown.html">
+      <b>Generic / unknown ATS</b>
+      Opaque field names and label-only matching &mdash; what generic mode has to cope with.
+    </a>
+  </body>
+</html>

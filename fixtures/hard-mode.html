@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Staff Engineer - Application (hard mode)</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 20px; }
+      .field { margin-bottom: 16px; }
+      label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+      input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
+      .step { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+      .note { background: #fff8e1; border-left: 3px solid #d97706; padding: 8px 12px; font-size: 13px; }
+      button { padding: 9px 16px; font: inherit; font-weight: 600; border: 0; border-radius: 6px; background: #2f6fed; color: #fff; }
+      #listbox { position: absolute; background: #fff; border: 1px solid #ccc; border-radius: 6px; min-width: 240px; z-index: 20; }
+      #listbox div { padding: 8px; cursor: pointer; }
+      #listbox div:hover { background: #eef3ff; }
+      .combo { border: 1px solid #ccc; border-radius: 6px; padding: 8px; cursor: pointer; background: #fff; }
+    </style>
+  </head>
+  <body>
+    <h1>Staff Engineer</h1>
+    <p class="note">
+      This fixture reproduces the three things that break naive autofill:
+      a framework-controlled input that reverts unauthorised writes, a field
+      inside a shadow root, and a second wizard step that only exists after you
+      click Next.
+    </p>
+
+    <form id="wizard">
+      <div class="step" id="step1">
+        <h2>Step 1 of 2</h2>
+
+        <div class="field">
+          <label for="ctrl_name">Full name (controlled input)</label>
+          <input type="text" id="ctrl_name" name="candidate_full_name" autocomplete="name" />
+          <small id="ctrl_state">component state: (empty)</small>
+        </div>
+
+        <div class="field">
+          <label for="plain_email">Email address</label>
+          <input type="email" id="plain_email" name="contact_email" />
+        </div>
+
+        <shadow-field label="Phone number" name="phone_number" type="tel"></shadow-field>
+
+        <div class="field">
+          <label id="lbl_country">Country</label>
+          <div class="combo" role="combobox" aria-haspopup="listbox" aria-labelledby="lbl_country"
+               tabindex="0" id="country_combo">Select a country</div>
+        </div>
+
+        <button type="button" id="next">Next</button>
+      </div>
+    </form>
+
+    <div id="listbox" role="listbox" hidden>
+      <div role="option">United States</div>
+      <div role="option">United Kingdom</div>
+      <div role="option">India</div>
+      <div role="option">Germany</div>
+    </div>
+
+    <script>
+      // ---- a React-style controlled input --------------------------------
+      // Component state is the source of truth. A direct `el.value = x` with no
+      // `input` event is reverted on the next frame, exactly as a framework
+      // re-render would. Writing through the prototype setter AND dispatching
+      // `input` is the only thing that sticks.
+      (function controlled() {
+        const el = document.getElementById('ctrl_name');
+        const out = document.getElementById('ctrl_state');
+        const nativeValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+        let state = '';
+        el.addEventListener('input', () => {
+          state = nativeValue.get.call(el);
+          out.textContent = 'component state: ' + (state || '(empty)');
+        });
+        const tick = () => {
+          if (nativeValue.get.call(el) !== state) nativeValue.set.call(el, state);
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      })();
+
+      // ---- a field inside a shadow root -----------------------------------
+      class ShadowField extends HTMLElement {
+        connectedCallback() {
+          const root = this.attachShadow({ mode: 'open' });
+          const label = this.getAttribute('label') || '';
+          root.innerHTML =
+            '<style>label{display:block;font:600 14px system-ui;margin-bottom:4px}'
+            + 'input{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;font:inherit}'
+            + 'div{margin-bottom:16px}</style>'
+            + '<div><label part="label">' + label + '</label>'
+            + '<input type="' + (this.getAttribute('type') || 'text') + '" '
+            + 'name="' + (this.getAttribute('name') || '') + '" /></div>';
+        }
+      }
+      customElements.define('shadow-field', ShadowField);
+
+      // ---- a portalled listbox --------------------------------------------
+      const combo = document.getElementById('country_combo');
+      const listbox = document.getElementById('listbox');
+      combo.addEventListener('mousedown', () => {
+        const r = combo.getBoundingClientRect();
+        listbox.style.left = r.left + 'px';
+        listbox.style.top = (r.bottom + window.scrollY + 4) + 'px';
+        listbox.hidden = !listbox.hidden;
+      });
+      listbox.addEventListener('click', (e) => {
+        if (e.target.getAttribute('role') !== 'option') return;
+        combo.textContent = e.target.textContent;
+        listbox.hidden = true;
+      });
+
+      // ---- step 2 appears only after Next ----------------------------------
+      document.getElementById('next').addEventListener('click', () => {
+        if (document.getElementById('step2')) return;
+        const step = document.createElement('div');
+        step.className = 'step';
+        step.id = 'step2';
+        step.innerHTML =
+          '<h2>Step 2 of 2</h2>'
+          + '<div class="field"><label for="s2_linkedin">LinkedIn profile</label>'
+          + '<input type="text" id="s2_linkedin" name="linkedin_url" /></div>'
+          + '<div class="field"><label for="s2_years">Years of professional experience</label>'
+          + '<input type="number" id="s2_years" name="years_of_experience" /></div>'
+          + '<div class="field"><label for="s2_why">Why do you want to work at our company?</label>'
+          + '<textarea id="s2_why" name="q_why_us"></textarea></div>'
+          + '<div class="field"><label for="s2_start">Earliest start date</label>'
+          + '<input type="date" id="s2_start" name="available_from" /></div>'
+          + '<button type="submit" id="final_submit">Submit application</button>';
+        document.getElementById('wizard').append(step);
+        document.getElementById('step1').querySelector('#next').disabled = true;
+      });
+
+      document.getElementById('wizard').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Fixture form: submission blocked.');
+      });
+    </script>
+  </body>
+</html>

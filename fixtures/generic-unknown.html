@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Careers - Apply now</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 620px; margin: 40px auto; padding: 0 20px; }
+      tr { vertical-align: top; }
+      td { padding: 6px 8px 14px 0; }
+      td.lbl { font-weight: 600; font-size: 14px; white-space: nowrap; }
+      input, select, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 6px; font: inherit; min-width: 280px; }
+      button { padding: 10px 18px; border: 0; border-radius: 6px; background: #444; color: #fff; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <h1>Apply now</h1>
+    <p>
+      A legacy-style form with meaningless control names, laid out in a table.
+      Nothing here matches a pack; only the visible labels identify the fields,
+      which is precisely what generic mode has to survive.
+    </p>
+
+    <form id="frm_apply">
+      <table>
+        <tr><td class="lbl">Applicant Name</td><td><input type="text" name="ctl00$txt01" id="ctl00_txt01" /></td></tr>
+        <tr><td class="lbl">E-mail Address</td><td><input type="text" name="ctl00$txt02" id="ctl00_txt02" /></td></tr>
+        <tr><td class="lbl">Mobile Number</td><td><input type="text" name="ctl00$txt03" id="ctl00_txt03" /></td></tr>
+        <tr><td class="lbl">City</td><td><input type="text" name="ctl00$txt04" id="ctl00_txt04" /></td></tr>
+        <tr><td class="lbl">Total Experience (years)</td><td><input type="text" name="ctl00$txt05" id="ctl00_txt05" /></td></tr>
+        <tr><td class="lbl">Current Employer</td><td><input type="text" name="ctl00$txt06" id="ctl00_txt06" /></td></tr>
+        <tr><td class="lbl">Notice Period</td><td><input type="text" name="ctl00$txt07" id="ctl00_txt07" /></td></tr>
+        <tr><td class="lbl">Expected CTC</td><td><input type="text" name="ctl00$txt08" id="ctl00_txt08" /></td></tr>
+        <tr><td class="lbl">Highest Qualification</td><td><input type="text" name="ctl00$txt09" id="ctl00_txt09" /></td></tr>
+        <tr>
+          <td class="lbl">Willing to relocate?</td>
+          <td>
+            <select name="ctl00$ddl01" id="ctl00_ddl01">
+              <option value="">-- select --</option>
+              <option value="Y">Yes</option>
+              <option value="N">No</option>
+            </select>
+          </td>
+        </tr>
+        <tr><td class="lbl">Upload Resume</td><td><input type="file" name="ctl00$fil01" id="ctl00_fil01" /></td></tr>
+        <tr><td class="lbl">Cover note</td><td><textarea name="ctl00$txa01" id="ctl00_txa01"></textarea></td></tr>
+      </table>
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      document.getElementById('frm_apply').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Fixture form: submission blocked.');
+      });
+    </script>
+  </body>
+</html>

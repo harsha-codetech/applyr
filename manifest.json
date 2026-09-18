@@ -1,0 +1,90 @@
+{
+  "manifest_version": 3,
+  "name": "applyr — job application autofill",
+  "version": "1.0.0",
+  "description": "Fill job applications from your saved profile. Everything stays on your device — no account, no server, no tracking.",
+  "minimum_chrome_version": "116",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["storage", "unlimitedStorage", "sidePanel", "scripting", "tabs"],
+  "optional_host_permissions": ["*://*/*"],
+  "host_permissions": [
+    "*://jobs.lever.co/*",
+    "*://boards.greenhouse.io/*",
+    "*://job-boards.greenhouse.io/*",
+    "*://*.greenhouse.io/*",
+    "*://jobs.ashbyhq.com/*",
+    "*://*.ashbyhq.com/*",
+    "*://*.workable.com/*",
+    "*://*.smartrecruiters.com/*",
+    "*://*.recruitee.com/*",
+    "*://*.bamboohr.com/*",
+    "*://*.applytojob.com/*",
+    "*://*.pinpointhq.com/*",
+    "*://*.teamtailor.com/*",
+    "*://*.breezy.hr/*",
+    "*://*.myworkdayjobs.com/*",
+    "*://*.icims.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "src/sidepanel/panel.html"
+  },
+  "action": {
+    "default_title": "applyr — open panel",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://jobs.lever.co/*",
+        "*://boards.greenhouse.io/*",
+        "*://job-boards.greenhouse.io/*",
+        "*://*.greenhouse.io/*",
+        "*://jobs.ashbyhq.com/*",
+        "*://*.ashbyhq.com/*",
+        "*://*.workable.com/*",
+        "*://*.smartrecruiters.com/*",
+        "*://*.recruitee.com/*",
+        "*://*.bamboohr.com/*",
+        "*://*.applytojob.com/*",
+        "*://*.pinpointhq.com/*",
+        "*://*.teamtailor.com/*",
+        "*://*.breezy.hr/*",
+        "*://*.myworkdayjobs.com/*",
+        "*://*.icims.com/*"
+      ],
+      "js": ["src/content/loader.js"],
+      "css": ["src/content/overlay.css"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/content/*.js",
+        "src/content/adapters/*.js",
+        "src/core/*.js",
+        "src/packs/*.json"
+      ],
+      "matches": ["*://*/*"]
+    }
+  ],
+  "commands": {
+    "fill-page": {
+      "suggested_key": { "default": "Alt+Shift+F" },
+      "description": "Fill the application form on this page"
+    }
+  }
+}

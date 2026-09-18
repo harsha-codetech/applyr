@@ -1,0 +1,411 @@
+/**
+ * Form detection.
+ *
+ * Walks the document - including open shadow roots - and turns raw controls into
+ * "descriptors": a normalised view of a form field with its best-guess visible
+ * label. Everything downstream (resolver, adapters, overlay) works on
+ * descriptors and never touches the DOM tree structure again.
+ */
+
+import { normalizeText } from '../core/util.js';
+
+const SKIP_TYPES = new Set([
+  'hidden', 'submit', 'button', 'reset', 'image', 'password'
+]);
+
+/** Inputs whose presence usually means "this is a login box, not an application". */
+const AUTH_HINT = /(^|\W)(password|sign[\s_-]?in|log[\s_-]?in)(\W|$)/i;
+
+let uidCounter = 0;
+function nextKey() {
+  uidCounter += 1;
+  return `f${uidCounter}`;
+}
+
+// ---------------------------------------------------------------------------
+// Traversal
+// ---------------------------------------------------------------------------
+
+/** Collect every element matching `selector`, descending into open shadow roots. */
+export function deepQueryAll(root, predicate) {
+  const out = [];
+  const stack = [root];
+  const seen = new Set();
+
+  while (stack.length) {
+    const node = stack.pop();
+    if (!node || seen.has(node)) continue;
+    seen.add(node);
+
+    if (node.nodeType === Node.ELEMENT_NODE && predicate(node)) out.push(node);
+
+    if (node.shadowRoot) stack.push(node.shadowRoot);
+
+    const children = node.children;
+    if (children) {
+      for (let i = children.length - 1; i >= 0; i--) stack.push(children[i]);
+    }
+  }
+  return out;
+}
+
+export function isVisible(el) {
+  if (!el || !el.isConnected) return false;
+  if (el.disabled) return false;
+  const style = el.ownerDocument.defaultView.getComputedStyle(el);
+  if (!style) return false;
+  if (style.visibility === 'hidden' || style.display === 'none' || style.opacity === '0') return false;
+  const rect = el.getBoundingClientRect();
+  // A zero-size box is still fillable when it is a styled file input hidden
+  // behind a drop zone, so file inputs get a pass.
+  if (rect.width === 0 && rect.height === 0) {
+    return el.tagName === 'INPUT' && el.type === 'file';
+  }
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Label extraction
+// ---------------------------------------------------------------------------
+
+function textOf(node) {
+  if (!node) return '';
+  const clone = node.cloneNode(true);
+  // Strip the control itself and any helper text that would poison the label.
+  clone.querySelectorAll?.('input, select, textarea, button, svg, script, style').forEach((n) => n.remove());
+  return (clone.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+function fromAriaLabelledBy(el) {
+  const ids = (el.getAttribute('aria-labelledby') || '').split(/\s+/).filter(Boolean);
+  if (!ids.length) return '';
+  const doc = el.getRootNode();
+  return ids
+    .map((id) => textOf(doc.getElementById ? doc.getElementById(id) : null))
+    .filter(Boolean)
+    .join(' ');
+}
+
+function fromAncestors(el) {
+  let node = el.parentElement;
+  let hops = 0;
+  while (node && hops < 5) {
+    // A wrapping <label> is the strongest signal.
+    if (node.tagName === 'LABEL') {
+      const t = textOf(node);
+      if (t) return t;
+    }
+    const labelish = node.querySelector?.(
+      'label, legend, .label, [class*="label" i], [class*="lbl" i], [data-testid*="label" i]'
+    );
+    if (labelish && !labelish.contains(el)) {
+      const t = textOf(labelish);
+      if (t && t.length < 300) return t;
+    }
+    node = node.parentElement;
+    hops += 1;
+  }
+  return '';
+}
+
+/**
+ * Labels that are not marked up as labels at all: a <td> to the left of the
+ * input, a <th> at the head of the row, or a bare <div>/<span> immediately
+ * before the control. Legacy enterprise forms are full of these, and without
+ * this stage generic mode reads nothing but opaque control names.
+ */
+function fromNeighbors(el) {
+  const cell = el.closest?.('td');
+  if (cell) {
+    const prev = cell.previousElementSibling;
+    if (prev && (prev.tagName === 'TD' || prev.tagName === 'TH')) {
+      const t = textOf(prev);
+      if (t && t.length < 200) return t;
+    }
+    const row = cell.closest('tr');
+    const th = row && row.querySelector('th');
+    if (th) {
+      const t = textOf(th);
+      if (t && t.length < 200) return t;
+    }
+  }
+
+  let node = el;
+  let hops = 0;
+  while (node && hops < 4) {
+    let sib = node.previousElementSibling;
+    while (sib) {
+      if (!sib.querySelector?.('input, select, textarea')
+        && !['INPUT', 'SELECT', 'TEXTAREA', 'SCRIPT', 'STYLE'].includes(sib.tagName)) {
+        const t = textOf(sib);
+        if (t && t.length < 200) return t;
+      }
+      sib = sib.previousElementSibling;
+    }
+    node = node.parentElement;
+    hops += 1;
+  }
+  return '';
+}
+
+function humanizeAttr(s) {
+  return String(s || '')
+    .replace(/\[|\]/g, ' ')
+    .replace(/[_\-.]+/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Every attribute worth pattern-matching against, joined into one haystack. */
+export function attrHaystack(el) {
+  const bits = [
+    el.getAttribute('name'),
+    el.getAttribute('id'),
+    el.getAttribute('data-qa'),
+    el.getAttribute('data-testid'),
+    el.getAttribute('data-automation-id'),
+    el.getAttribute('data-field'),
+    el.getAttribute('formcontrolname')
+  ].filter(Boolean);
+  return bits.join(' ');
+}
+
+/** Best-effort visible label for a control. */
+export function labelFor(el) {
+  // 1. <label for=...>
+  if (el.labels && el.labels.length) {
+    const t = textOf(el.labels[0]);
+    if (t) return t;
+  }
+  // 2. aria-labelledby
+  const byAria = fromAriaLabelledBy(el);
+  if (byAria) return byAria;
+  // 3. aria-label
+  const aria = el.getAttribute('aria-label');
+  if (aria && aria.trim()) return aria.trim();
+  // 4. wrapping/sibling label-ish node
+  const anc = fromAncestors(el);
+  if (anc) return anc;
+  // 5. placeholder / title
+  const ph = el.getAttribute('placeholder') || el.getAttribute('title');
+  if (ph && ph.trim()) return ph.trim();
+  // 6. unmarked-up neighbour text (table cells, bare divs)
+  const nb = fromNeighbors(el);
+  if (nb) return nb;
+  // 7. last resort: humanised attribute
+  return humanizeAttr(attrHaystack(el).split(' ')[0] || '');
+}
+
+/** Label for a radio/checkbox group - prefers the fieldset legend. */
+function groupLabel(els) {
+  const first = els[0];
+  const fs = first.closest?.('fieldset');
+  if (fs) {
+    const legend = fs.querySelector('legend');
+    const t = textOf(legend);
+    if (t) return t;
+  }
+  const grouped = first.closest?.('[role="group"], [role="radiogroup"]');
+  if (grouped) {
+    const t = textOf(grouped.querySelector('legend, .label, [class*="label" i]'));
+    if (t) return t;
+  }
+  return fromAncestors(first) || humanizeAttr(first.getAttribute('name') || '');
+}
+
+// ---------------------------------------------------------------------------
+// Descriptors
+// ---------------------------------------------------------------------------
+
+function optionsOfSelect(el) {
+  return [...el.options].map((o) => ({
+    value: o.value,
+    label: (o.textContent || '').trim(),
+    el: o
+  }));
+}
+
+function optionsOfGroup(els) {
+  return els.map((el) => ({
+    value: el.value,
+    label: labelFor(el),
+    el
+  }));
+}
+
+function currentValue(desc) {
+  switch (desc.kind) {
+    case 'checkbox':
+      return desc.el.checked ? 'true' : '';
+    case 'radio-group': {
+      const on = desc.options.find((o) => o.el.checked);
+      return on ? on.value : '';
+    }
+    case 'file':
+      return desc.el.files && desc.el.files.length ? desc.el.files[0].name : '';
+    case 'contenteditable':
+      return (desc.el.textContent || '').trim();
+    default:
+      return desc.el.value || '';
+  }
+}
+
+function makeDescriptor(partial) {
+  const desc = {
+    key: nextKey(),
+    required: false,
+    options: [],
+    ...partial
+  };
+  desc.label = desc.label || labelFor(desc.el);
+  desc.attrs = desc.attrs !== undefined ? desc.attrs : attrHaystack(desc.el);
+  desc.normLabel = normalizeText(desc.label);
+  desc.normAttrs = normalizeText(humanizeAttr(desc.attrs));
+  desc.autocomplete = (desc.el.getAttribute?.('autocomplete') || '').toLowerCase();
+  desc.current = currentValue(desc);
+  desc.hasValue = desc.current !== '';
+  return desc;
+}
+
+/**
+ * Detect a custom combobox: a control that looks like a dropdown but is not a
+ * <select>. Ashby, Workday and the newer Greenhouse boards all use these.
+ */
+function isCombobox(el) {
+  const role = el.getAttribute('role');
+  if (role === 'combobox') return true;
+  if (el.getAttribute('aria-haspopup') === 'listbox') return true;
+  if (el.tagName === 'INPUT' && el.getAttribute('aria-autocomplete')) return true;
+  return false;
+}
+
+/**
+ * Scan a document (or a subtree) and return descriptors for everything fillable.
+ * @param {Document|Element} root
+ */
+export function scan(root = document) {
+  uidCounter = 0;
+  const controls = deepQueryAll(root, (el) => {
+    const tag = el.tagName;
+    if (tag === 'INPUT') return !SKIP_TYPES.has((el.type || 'text').toLowerCase());
+    if (tag === 'SELECT' || tag === 'TEXTAREA') return true;
+    if (el.isContentEditable && el.getAttribute('contenteditable') === 'true') return true;
+    return false;
+  }).filter(isVisible);
+
+  const descriptors = [];
+  const radioGroups = new Map();
+
+  for (const el of controls) {
+    const tag = el.tagName;
+    const type = (el.type || '').toLowerCase();
+
+    if (tag === 'INPUT' && type === 'radio') {
+      const name = el.getAttribute('name') || `anon-${el.closest('fieldset') ? 'fs' : 'x'}`;
+      if (!radioGroups.has(name)) radioGroups.set(name, []);
+      radioGroups.get(name).push(el);
+      continue;
+    }
+
+    if (tag === 'SELECT') {
+      descriptors.push(makeDescriptor({
+        el, kind: 'select',
+        options: optionsOfSelect(el),
+        required: el.required || el.getAttribute('aria-required') === 'true'
+      }));
+      continue;
+    }
+
+    if (tag === 'TEXTAREA') {
+      descriptors.push(makeDescriptor({
+        el, kind: 'textarea',
+        required: el.required || el.getAttribute('aria-required') === 'true'
+      }));
+      continue;
+    }
+
+    if (el.isContentEditable) {
+      descriptors.push(makeDescriptor({ el, kind: 'contenteditable' }));
+      continue;
+    }
+
+    if (type === 'checkbox') {
+      descriptors.push(makeDescriptor({
+        el, kind: 'checkbox',
+        required: el.required
+      }));
+      continue;
+    }
+
+    if (type === 'file') {
+      descriptors.push(makeDescriptor({
+        el, kind: 'file',
+        accept: el.getAttribute('accept') || '',
+        required: el.required
+      }));
+      continue;
+    }
+
+    descriptors.push(makeDescriptor({
+      el,
+      kind: isCombobox(el) ? 'combobox' : 'text',
+      inputType: type || 'text',
+      required: el.required || el.getAttribute('aria-required') === 'true'
+    }));
+  }
+
+  for (const [name, els] of radioGroups) {
+    if (!els.length) continue;
+    descriptors.push(makeDescriptor({
+      el: els[0],
+      kind: 'radio-group',
+      groupName: name,
+      options: optionsOfGroup(els),
+      label: groupLabel(els),
+      attrs: name,
+      required: els.some((e) => e.required)
+    }));
+  }
+
+  // Non-<select> comboboxes rendered as divs (Workday, some Ashby widgets).
+  const widgetBoxes = deepQueryAll(root, (el) => (
+    el.tagName !== 'INPUT' && el.tagName !== 'SELECT' && isCombobox(el)
+  )).filter(isVisible);
+
+  for (const el of widgetBoxes) {
+    if (descriptors.some((d) => d.el === el || el.contains(d.el))) continue;
+    descriptors.push(makeDescriptor({ el, kind: 'combobox' }));
+  }
+
+  return descriptors;
+}
+
+/** Heuristic: does this page look like a job application rather than a login? */
+export function looksLikeApplication(descriptors, doc = document) {
+  if (descriptors.length < 3) return false;
+  const hasFile = descriptors.some((d) => d.kind === 'file');
+  const hasEmail = descriptors.some((d) => /mail/i.test(d.normAttrs) || /mail/i.test(d.normLabel));
+  const sample = normalizeText(
+    `${doc.title || ''} ${(doc.body && doc.body.innerText) || ''}`.slice(0, 4000)
+  );
+  const applyWords = /(apply|application|applicant|resume|cv|cover letter|candidate|job|position|vacancy|submit your)/i
+    .test(sample);
+  const authOnly = AUTH_HINT.test(sample) && descriptors.length < 6;
+  return !authOnly && (hasFile || (hasEmail && applyWords) || (applyWords && descriptors.length >= 6));
+}
+
+/** Locate the submit control so the tracker can notice a real submission. */
+export function findSubmit(selectors, root = document) {
+  for (const sel of selectors) {
+    const el = deepQueryAll(root, (n) => {
+      try {
+        return n.matches(sel);
+      } catch {
+        return false;
+      }
+    })[0];
+    if (el && isVisible(el)) return el;
+  }
+  return null;
+}

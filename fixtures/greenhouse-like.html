@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Senior Engineer - Application</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 20px; }
+      h1 { font-size: 22px; }
+      .field { margin-bottom: 18px; }
+      .field label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 14px; }
+      input[type="text"], input[type="email"], input[type="tel"], select, textarea {
+        width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font: inherit;
+      }
+      .select__control { border: 1px solid #ccc; border-radius: 6px; padding: 8px; cursor: pointer; background: #fff; }
+      .select__menu { border: 1px solid #ccc; border-radius: 6px; margin-top: 4px; background: #fff; position: absolute; z-index: 10; min-width: 260px; }
+      .select__option { padding: 8px; cursor: pointer; }
+      .select__option:hover { background: #eef3ff; }
+      fieldset { border: 1px solid #ddd; border-radius: 6px; }
+      button { padding: 10px 18px; font: inherit; font-weight: 600; border-radius: 6px; border: 0; background: #2f6fed; color: #fff; }
+    </style>
+  </head>
+  <body>
+    <h1 class="app-title">Senior Engineer</h1>
+    <p>Fixture that imitates a Greenhouse board: stable ids, a react-select-style
+      combobox, a file input behind a drop zone, and EEO selects.</p>
+
+    <form id="application_form">
+      <div class="field">
+        <label for="first_name">First Name *</label>
+        <input type="text" id="first_name" name="job_application[first_name]" autocomplete="given-name" required />
+      </div>
+      <div class="field">
+        <label for="last_name">Last Name *</label>
+        <input type="text" id="last_name" name="job_application[last_name]" autocomplete="family-name" required />
+      </div>
+      <div class="field">
+        <label for="email">Email *</label>
+        <input type="email" id="email" name="job_application[email]" required />
+      </div>
+      <div class="field">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="job_application[phone]" />
+      </div>
+
+      <div class="field" data-dropzone>
+        <label for="resume">Resume/CV *</label>
+        <input type="file" id="resume" name="job_application[resume]" accept=".pdf,.doc,.docx" />
+      </div>
+
+      <div class="field">
+        <label for="q_linkedin">LinkedIn Profile</label>
+        <input type="text" id="q_linkedin" name="job_application[answers_attributes][0][text_value]" />
+      </div>
+
+      <div class="field">
+        <label id="lbl_hear">How did you hear about us? *</label>
+        <div class="select__control" role="combobox" aria-haspopup="listbox"
+             aria-labelledby="lbl_hear" tabindex="0" id="hear_control">Select...</div>
+        <div class="select__menu" id="hear_menu" hidden>
+          <div class="select__option" role="option">LinkedIn</div>
+          <div class="select__option" role="option">Referral</div>
+          <div class="select__option" role="option">Company website</div>
+          <div class="select__option" role="option">Job board</div>
+        </div>
+      </div>
+
+      <fieldset class="field">
+        <legend>Are you legally authorized to work in the United States?</legend>
+        <label><input type="radio" name="work_authorization" value="1" /> Yes</label>
+        <label><input type="radio" name="work_authorization" value="0" /> No</label>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Will you now or in the future require sponsorship?</legend>
+        <label><input type="radio" name="sponsorship" value="1" /> Yes</label>
+        <label><input type="radio" name="sponsorship" value="0" /> No</label>
+      </fieldset>
+
+      <div class="field">
+        <label for="job_application_gender">Gender</label>
+        <select id="job_application_gender" name="job_application[gender]">
+          <option value="">Please select</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Decline To Self Identify</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="job_application_veteran_status">Veteran Status</label>
+        <select id="job_application_veteran_status" name="job_application[veteran_status]">
+          <option value="">Please select</option>
+          <option>I am not a protected veteran</option>
+          <option>I identify as one or more of the classifications of a protected veteran</option>
+          <option>I don't wish to answer</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="cover_letter_text">Anything else we should know?</label>
+        <textarea id="cover_letter_text" name="job_application[cover_letter_text]"></textarea>
+      </div>
+
+      <button type="submit" id="submit_app">Submit Application</button>
+    </form>
+
+    <script>
+      // Minimal react-select imitation: the visible text is component state, so
+      // writing to it directly does nothing - the adapter must click an option.
+      const control = document.getElementById('hear_control');
+      const menu = document.getElementById('hear_menu');
+      control.addEventListener('mousedown', () => { menu.hidden = !menu.hidden; });
+      menu.addEventListener('click', (e) => {
+        if (!e.target.matches('.select__option')) return;
+        control.textContent = e.target.textContent;
+        control.dataset.value = e.target.textContent;
+        menu.hidden = true;
+      });
+      document.getElementById('application_form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Fixture form: submission blocked.');
+      });
+    </script>
+  </body>
+</html>

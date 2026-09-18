@@ -1,0 +1,32 @@
+/*
+ * Page-scope styles. Only the field rings live here - the HUD itself renders
+ * inside a shadow root so the host page's CSS cannot reach it, and so these
+ * class names are the extension's entire footprint on the page.
+ */
+
+.applyr-ring-ok,
+.applyr-ring-warn,
+.applyr-ring-err,
+.applyr-ring-focus {
+  transition: box-shadow 140ms ease-out !important;
+}
+
+.applyr-ring-ok {
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.55) !important;
+  border-radius: 4px;
+}
+
+.applyr-ring-warn {
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.65) !important;
+  border-radius: 4px;
+}
+
+.applyr-ring-err {
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.6) !important;
+  border-radius: 4px;
+}
+
+.applyr-ring-focus {
+  box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.85) !important;
+  border-radius: 4px;
+}

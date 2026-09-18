@@ -1,0 +1,69 @@
+{
+  "id": "greenhouse",
+  "name": "Greenhouse",
+  "match": ["boards.greenhouse.io", "job-boards.greenhouse.io", "greenhouse.io"],
+  "detect": {
+    "any": [
+      "#application_form",
+      "#application-form",
+      "[data-provides='application-form']",
+      "form#s3_upload_form",
+      "div#grnhse_app",
+      "iframe#grnhse_iframe"
+    ]
+  },
+  "meta": {
+    "company": ["#logo img[alt]", ".company-name", "meta[property='og:site_name']"],
+    "role": [".app-title", "h1.section-header", "h1", "meta[property='og:title']"]
+  },
+  "submit": ["#submit_app", "button[type='submit']", "input[type='submit']"],
+  "confirm": ["#application_confirmation", ".application-confirmation", "[data-testid='confirmation']"],
+  "widgets": {
+    "combobox": {
+      "trigger": ".select__control, [role='combobox'], .select2-container",
+      "option": ".select__option, [role='option'], .select2-result-label",
+      "input": ".select__input input, input[role='combobox']"
+    }
+  },
+  "fields": [
+    { "id": "first_name", "selector": ["#first_name", "input[name='job_application[first_name]']", "input[autocomplete='given-name']"] },
+    { "id": "last_name", "selector": ["#last_name", "input[name='job_application[last_name]']", "input[autocomplete='family-name']"] },
+    { "id": "email", "selector": ["#email", "input[name='job_application[email]']"] },
+    { "id": "phone", "selector": ["#phone", "input[name='job_application[phone]']"] },
+    { "id": "full_address", "selector": ["#auto_complete_input", "input[name='job_application[location]']"] },
+    { "id": "resume_file", "selector": ["#resume", "input[name='job_application[resume]']", "input[type='file'][id*='resume']"] },
+    { "id": "cover_letter_file", "selector": ["#cover_letter", "input[name='job_application[cover_letter]']", "input[type='file'][id*='cover']"] },
+    { "id": "cover_letter_text", "selector": ["#cover_letter_text", "textarea[name*='cover_letter']"] },
+    { "id": "linkedin_url", "selector": ["input[id*='linkedin' i]", "input[name*='linkedin' i]"] },
+    { "id": "github_url", "selector": ["input[id*='github' i]", "input[name*='github' i]"] },
+    { "id": "portfolio_url", "selector": ["input[id*='website' i]", "input[id*='portfolio' i]"] },
+    { "id": "school", "selector": ["input[id*='school' i]", "select[id*='school' i]", "#education_school_name_0"] },
+    { "id": "degree", "selector": ["input[id*='degree' i]", "select[id*='degree' i]", "#education_degree_0"] },
+    { "id": "field_of_study", "selector": ["input[id*='discipline' i]", "select[id*='discipline' i]", "#education_discipline_0"] },
+    {
+      "id": "eeo_gender",
+      "selector": ["#job_application_gender", "select[name*='gender' i]", "[aria-label*='gender' i]"]
+    },
+    {
+      "id": "eeo_hispanic",
+      "selector": ["#job_application_hispanic_ethnicity", "select[name*='hispanic' i]"]
+    },
+    {
+      "id": "eeo_race",
+      "selector": ["#job_application_race", "select[name*='race' i]"]
+    },
+    {
+      "id": "eeo_veteran",
+      "selector": ["#job_application_veteran_status", "select[name*='veteran' i]"]
+    },
+    {
+      "id": "eeo_disability",
+      "selector": ["#job_application_disability_status", "select[name*='disability' i]"],
+      "options": {
+        "Yes, I have a disability, or have had one in the past": "Yes, I have a disability, or have had one in the past",
+        "No, I do not have a disability and have not had one in the past": "No, I do not have a disability and have not had one in the past",
+        "I do not want to answer": "I do not want to answer"
+      }
+    }
+  ]
+}

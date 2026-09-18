@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Welcome to applyr</title>
+    <link rel="stylesheet" href="../sidepanel/panel.css" />
+    <style>
+      body { align-items: center; }
+      main.page { max-width: 640px; margin: 0 auto; padding: 40px 24px 64px; }
+      h1 { font-size: 26px; letter-spacing: -0.02em; margin: 0 0 6px; }
+      .lede { color: var(--muted); font-size: 15px; margin: 0 0 28px; }
+      ol.steps { padding-left: 18px; margin: 0; }
+      ol.steps li { margin-bottom: 16px; }
+      ol.steps b { display: block; }
+      .kbd {
+        font: 12px ui-monospace, SFMono-Regular, Menlo, monospace;
+        border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; background: var(--bg-sub);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <h1>applyr is installed</h1>
+      <p class="lede">
+        Fill job applications from one profile. Nothing leaves this browser &mdash; no account,
+        no server, no analytics.
+      </p>
+
+      <div class="card">
+        <h3>Three things to know</h3>
+        <ol class="steps">
+          <li>
+            <b>You always submit.</b>
+            applyr fills the form and rings every field it touched. Reviewing and clicking
+            Submit stays with you &mdash; that is deliberate, not a missing feature.
+          </li>
+          <li>
+            <b>It gets smarter as you use it.</b>
+            Anything it cannot place, you can teach once. The next employer who asks the same
+            question in different words gets the same answer automatically.
+          </li>
+          <li>
+            <b>Your data is only here.</b>
+            Profile, r&eacute;sum&eacute;s and saved answers live in this browser profile.
+            Export a backup from Settings &mdash; there is no cloud copy to fall back on.
+          </li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3>Get started</h3>
+        <ol class="steps">
+          <li><b>Open the side panel</b> from the toolbar icon, or with the button below.</li>
+          <li><b>Fill in your profile</b> &mdash; name, contact, links, work history.</li>
+          <li><b>Upload a r&eacute;sum&eacute;</b> under Documents. PDF parses best.</li>
+          <li>
+            <b>Open any job application</b> on Lever, Greenhouse, Ashby and the other supported
+            boards, then press <span class="kbd">Alt+Shift+F</span> or use the panel button.
+          </li>
+        </ol>
+        <button class="btn wide" id="open">Open the side panel</button>
+      </div>
+
+      <p class="small muted">
+        On a site applyr does not ship a pack for, it falls back to generic matching and usually
+        still fills most of the form. Grant access per-site from the panel when you want that.
+      </p>
+    </main>
+    <script type="module" src="welcome.js"></script>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Product Engineer - Apply</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 620px; margin: 40px auto; padding: 0 20px; }
+      .application-field { margin-bottom: 16px; }
+      .application-label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+      input, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; font: inherit; }
+      .template-btn-submit { padding: 10px 18px; border: 0; border-radius: 6px; background: #111; color: #fff; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <div class="posting-headline"><h2>Product Engineer</h2></div>
+    <p>Fixture imitating a Lever posting: bracketed url field names, a single
+      full-name field, no ids at all.</p>
+
+    <form class="application-form">
+      <div class="application-field">
+        <label class="application-label" for="name">Full name<span>&#9733;</span></label>
+        <input type="text" name="name" id="name" required />
+      </div>
+      <div class="application-field">
+        <label class="application-label" for="email">Email<span>&#9733;</span></label>
+        <input type="email" name="email" id="email" required />
+      </div>
+      <div class="application-field">
+        <label class="application-label" for="phone">Phone</label>
+        <input type="tel" name="phone" id="phone" />
+      </div>
+      <div class="application-field">
+        <label class="application-label" for="org">Current company</label>
+        <input type="text" name="org" id="org" />
+      </div>
+      <div class="application-field">
+        <label class="application-label">LinkedIn URL</label>
+        <input type="text" name="urls[LinkedIn]" />
+      </div>
+      <div class="application-field">
+        <label class="application-label">GitHub URL</label>
+        <input type="text" name="urls[GitHub]" />
+      </div>
+      <div class="application-field">
+        <label class="application-label">Portfolio URL</label>
+        <input type="text" name="urls[Portfolio]" />
+      </div>
+      <div class="application-field">
+        <label class="application-label" for="resume-upload-input">Resume/CV</label>
+        <input type="file" name="resume" id="resume-upload-input" />
+      </div>
+      <div class="application-field">
+        <label class="application-label" for="additional-information">Additional information</label>
+        <textarea name="comments" id="additional-information"></textarea>
+      </div>
+      <button class="template-btn-submit" type="submit">Submit application</button>
+    </form>
+
+    <script>
+      document.querySelector('.application-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Fixture form: submission blocked.');
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "id": "ashby",
+  "name": "Ashby",
+  "match": ["jobs.ashbyhq.com", "ashbyhq.com"],
+  "detect": {
+    "any": [
+      "#ashby-application-form-container",
+      "[class*='ashby-application-form']",
+      "form[class*='ashby']",
+      "input[name='_systemfield_name']"
+    ]
+  },
+  "meta": {
+    "company": ["[class*='ashby-job-posting-brief'] img[alt]", "meta[property='og:site_name']"],
+    "role": ["h1", "[class*='job-posting-header'] h1", "meta[property='og:title']"]
+  },
+  "submit": ["button[type='submit']", "[class*='ashby-application-form-submit-button']"],
+  "confirm": ["[class*='application-confirmation']", "[class*='ashby-application-success']"],
+  "widgets": {
+    "combobox": {
+      "trigger": "[role='combobox'], [class*='_select_'], [class*='ashby-select']",
+      "option": "[role='option'], [class*='_option_']",
+      "input": "input[role='combobox']"
+    }
+  },
+  "fields": [
+    { "id": "full_name", "selector": ["input[name='_systemfield_name']", "#_systemfield_name"] },
+    { "id": "email", "selector": ["input[name='_systemfield_email']", "#_systemfield_email"] },
+    { "id": "phone", "selector": ["input[name='_systemfield_phone']", "#_systemfield_phone"] },
+    { "id": "full_address", "selector": ["input[name='_systemfield_location']", "#_systemfield_location"] },
+    { "id": "resume_file", "selector": ["input[name='_systemfield_resume']", "input[type='file'][id*='resume' i]", "input[type='file']"] },
+    { "id": "linkedin_url", "selector": ["input[name*='linkedin' i]", "input[id*='linkedin' i]"] },
+    { "id": "github_url", "selector": ["input[name*='github' i]", "input[id*='github' i]"] },
+    { "id": "portfolio_url", "selector": ["input[name*='website' i]", "input[name*='portfolio' i]"] }
+  ]
+}

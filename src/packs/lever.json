@@ -1,0 +1,58 @@
+{
+  "id": "lever",
+  "name": "Lever",
+  "match": ["jobs.lever.co", "lever.co", "hire.lever.co"],
+  "detect": {
+    "any": [
+      "form.application-form",
+      "form[action*='lever.co']",
+      "div.application-form",
+      "input[name='urls[LinkedIn]']"
+    ]
+  },
+  "meta": {
+    "company": [".main-header-logo img[alt]", ".posting-header .posting-categories", "meta[property='og:site_name']"],
+    "role": [".posting-headline h2", "h2.posting-headline", "meta[property='og:title']"]
+  },
+  "submit": ["button[type='submit']", ".template-btn-submit", "#btn-submit"],
+  "confirm": [".confirmation-wrapper", "[data-qa='confirmation']", ".postings-confirmation"],
+  "widgets": {
+    "combobox": {
+      "trigger": ".application-dropdown, [role='combobox']",
+      "option": "[role='option'], .dropdown-option"
+    }
+  },
+  "fields": [
+    { "id": "full_name", "selector": ["input[name='name']", "#name"] },
+    { "id": "email", "selector": ["input[name='email']", "#email"] },
+    { "id": "phone", "selector": ["input[name='phone']", "#phone"] },
+    { "id": "current_company", "selector": ["input[name='org']", "#org"] },
+    { "id": "linkedin_url", "selector": ["input[name='urls[LinkedIn]']"] },
+    { "id": "github_url", "selector": ["input[name='urls[GitHub]']", "input[name='urls[Github]']"] },
+    { "id": "portfolio_url", "selector": ["input[name='urls[Portfolio]']"] },
+    { "id": "other_url", "selector": ["input[name='urls[Other]']"] },
+    { "id": "resume_file", "selector": ["input[name='resume']", "input[type='file']#resume-upload-input"] },
+    { "id": "additional_info", "selector": ["textarea[name='comments']", "#additional-information"] },
+    {
+      "id": "eeo_gender",
+      "selector": ["select[name='eeo[gender]']", "[name='eeo[gender]']"],
+      "options": {
+        "Male": "Male",
+        "Female": "Female",
+        "Decline to self-identify": "Decline to self-identify"
+      }
+    },
+    {
+      "id": "eeo_race",
+      "selector": ["select[name='eeo[race]']", "[name='eeo[race]']"]
+    },
+    {
+      "id": "eeo_veteran",
+      "selector": ["select[name='eeo[veteran]']", "[name='eeo[veteran]']"]
+    },
+    {
+      "id": "eeo_disability",
+      "selector": ["select[name='eeo[disability]']", "[name='eeo[disability]']"]
+    }
+  ]
+}
