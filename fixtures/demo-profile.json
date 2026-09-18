@@ -1,0 +1,145 @@
+{
+  "format": "applyr-export",
+  "version": 1,
+  "exportedAt": "2026-09-18T15:49:15.189Z",
+  "profile": {
+    "version": 1,
+    "values": {
+      "first_name": "Ada",
+      "last_name": "Lovelace",
+      "email": "ada.lovelace@example.com",
+      "phone": "+1 555 0100",
+      "pronouns": "she/her",
+      "linkedin_url": "https://linkedin.com/in/ada-demo",
+      "github_url": "https://github.com/ada-demo",
+      "portfolio_url": "https://ada-demo.dev",
+      "address_line1": "12 Analytical Way",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "postal_code": "560001",
+      "country": "India",
+      "current_company": "Analytical Engines Ltd",
+      "current_title": "Senior Software Engineer",
+      "years_experience": "7",
+      "desired_salary": "28 LPA",
+      "notice_period": "30 days",
+      "earliest_start_date": "2026-11-02",
+      "work_auth_us": "no",
+      "requires_sponsorship": "yes",
+      "willing_to_relocate": "yes",
+      "remote_preference": "Hybrid",
+      "over_18": "yes",
+      "previously_employed": "no",
+      "non_compete": "no",
+      "how_did_you_hear": "LinkedIn",
+      "why_this_company": "You are rebuilding the payments stack, and shipping that twice is the most useful thing I know how to do.",
+      "why_this_role": "It is the rare backend role where latency work and product judgement are the same job.",
+      "additional_info": "Happy to share design docs from the settlement rewrite on request.",
+      "privacy_consent": "yes",
+      "terms_consent": "yes",
+      "marketing_consent": "no"
+    },
+    "experience": [
+      {
+        "id": "exp1",
+        "company": "Analytical Engines Ltd",
+        "title": "Senior Software Engineer",
+        "location": "Bengaluru",
+        "start": "2022-03",
+        "end": "",
+        "current": true,
+        "description": "Led the payments rewrite; cut settlement latency by 60 percent."
+      },
+      {
+        "id": "exp2",
+        "company": "Difference Machines",
+        "title": "Software Engineer",
+        "location": "Bengaluru",
+        "start": "2019-07",
+        "end": "2022-02",
+        "current": false,
+        "description": "Built the ingestion pipeline handling 40M events per day."
+      }
+    ],
+    "education": [
+      {
+        "id": "edu1",
+        "school": "University of London",
+        "degree": "BSc",
+        "field": "Computer Science",
+        "start": "2016-09",
+        "end": "2019-06",
+        "gpa": "3.8"
+      }
+    ],
+    "settings": {
+      "fillSensitive": false,
+      "defaultResumeId": null,
+      "autoFillOnLoad": false,
+      "overwriteExisting": false,
+      "highlightFilled": true,
+      "learnUnknownFields": true
+    },
+    "updatedAt": "2026-09-18T15:49:15.189Z"
+  },
+  "memory": [
+    {
+      "id": "mem1",
+      "key": "why want work company",
+      "question": "Why do you want to work at our company?",
+      "answer": "You are rebuilding the payments stack, and shipping that twice is the most useful thing I know how to do.",
+      "fieldId": null,
+      "type": "textarea",
+      "uses": 0,
+      "createdAt": "2026-09-18T15:49:15.189Z",
+      "updatedAt": "2026-09-18T15:49:15.189Z"
+    },
+    {
+      "id": "mem2",
+      "key": "describe time shipped under pressure",
+      "question": "Describe a time you shipped under pressure",
+      "answer": "I rewrote the billing importer the night before launch after we found a rounding bug in production data.",
+      "fieldId": null,
+      "type": "textarea",
+      "uses": 0,
+      "createdAt": "2026-09-18T15:49:15.189Z",
+      "updatedAt": "2026-09-18T15:49:15.189Z"
+    },
+    {
+      "id": "mem3",
+      "key": "what salary expectations",
+      "question": "What are your salary expectations?",
+      "answer": "28 LPA, negotiable for the right team.",
+      "fieldId": null,
+      "type": "text",
+      "uses": 0,
+      "createdAt": "2026-09-18T15:49:15.189Z",
+      "updatedAt": "2026-09-18T15:49:15.189Z"
+    },
+    {
+      "id": "mem4",
+      "key": "cover note",
+      "question": "Cover note",
+      "answer": "Seven years building payments and data infrastructure. Happy to go deeper on any of it.",
+      "fieldId": null,
+      "type": "textarea",
+      "uses": 0,
+      "createdAt": "2026-09-18T15:49:15.189Z",
+      "updatedAt": "2026-09-18T15:49:15.189Z"
+    }
+  ],
+  "applications": [],
+  "sites": {},
+  "files": [
+    {
+      "id": "demo-resume",
+      "name": "ada-lovelace-resume.pdf",
+      "type": "application/pdf",
+      "size": 1270,
+      "kind": "resume",
+      "label": "Ada Lovelace - resume",
+      "createdAt": "2026-09-18T15:49:15.189Z",
+      "data": "JVBERi0xLjQKMSAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgMiAwIFI+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL1BhZ2VzL0tpZHNbMyAwIFJdL0NvdW50IDE+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL1BhZ2UvUGFyZW50IDIgMCBSL01lZGlhQm94WzAgMCA2MTIgNzkyXS9SZXNvdXJjZXM8PC9Gb250PDwvRjEgNCAwIFI+Pj4+L0NvbnRlbnRzIDUgMCBSPj4KZW5kb2JqCjQgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhPj4KZW5kb2JqCjUgMCBvYmoKPDwvTGVuZ3RoIDc2MT4+CnN0cmVhbQpCVAovRjEgMjAgVGYKNzIgNzIwIFRkCihBZGEgTG92ZWxhY2UpIFRqCi9GMSAxMSBUZgowIC0yNiBUZAooU2VuaW9yIFNvZnR3YXJlIEVuZ2luZWVyICB8ICBhZGEubG92ZWxhY2VAZXhhbXBsZS5jb20gIHwgICsxIDU1NSAwMTAwKSBUaiAwIC0xNiBUZAooQmVuZ2FsdXJ1LCBJbmRpYSAgfCAgbGlua2VkaW4uY29tL2luL2FkYS1kZW1vICB8ICBnaXRodWIuY29tL2FkYS1kZW1vKSBUaiAwIC0xNiBUZAooKSBUaiAwIC0xNiBUZAooRVhQRVJJRU5DRSkgVGogMCAtMTYgVGQKKEFuYWx5dGljYWwgRW5naW5lcyBMdGQgLSBTZW5pb3IgU29mdHdhcmUgRW5naW5lZXIsIDIwMjIgdG8gcHJlc2VudCkgVGogMCAtMTYgVGQKKCAgIExlZCB0aGUgcGF5bWVudHMgcmV3cml0ZTsgY3V0IHNldHRsZW1lbnQgbGF0ZW5jeSBieSA2MCBwZXJjZW50LikgVGogMCAtMTYgVGQKKERpZmZlcmVuY2UgTWFjaGluZXMgLSBTb2Z0d2FyZSBFbmdpbmVlciwgMjAxOSB0byAyMDIyKSBUaiAwIC0xNiBUZAooICAgQnVpbHQgdGhlIGluZ2VzdGlvbiBwaXBlbGluZSBoYW5kbGluZyA0ME0gZXZlbnRzIHBlciBkYXkuKSBUaiAwIC0xNiBUZAooKSBUaiAwIC0xNiBUZAooRURVQ0FUSU9OKSBUaiAwIC0xNiBUZAooVW5pdmVyc2l0eSBvZiBMb25kb24gLSBCU2MgQ29tcHV0ZXIgU2NpZW5jZSwgMjAxOSkgVGogMCAtMTYgVGQKKCkgVGogMCAtMTYgVGQKKFNBTVBMRSBET0NVTUVOVCAtIGRlbW8gZGF0YSBmb3IgdGhlIGFwcGx5ciBleHRlbnNpb24uKSBUaiAwIC0xNiBUZApFVAplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA2CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAwOSAwMDAwMCBuIAowMDAwMDAwMDU0IDAwMDAwIG4gCjAwMDAwMDAxMDUgMDAwMDAgbiAKMDAwMDAwMDIxNyAwMDAwMCBuIAowMDAwMDAwMjgwIDAwMDAwIG4gCnRyYWlsZXIKPDwvU2l6ZSA2L1Jvb3QgMSAwIFI+PgpzdGFydHhyZWYKMTA5MAolJUVPRg=="
+    }
+  ]
+}

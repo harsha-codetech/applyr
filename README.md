@@ -22,6 +22,8 @@ git clone <this repo> && cd applyr
 
 There is no build step. The source you read is the source that runs.
 
+For a guided walkthrough with sample data, see [docs/DEMO.md](docs/DEMO.md).
+
 ## Use
 
 | | |
