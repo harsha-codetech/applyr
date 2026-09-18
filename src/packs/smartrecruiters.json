@@ -1,0 +1,90 @@
+{
+  "id": "smartrecruiters",
+  "name": "SmartRecruiters",
+  "match": [
+    "jobs.smartrecruiters.com",
+    "smartrecruiters.com",
+    "smartr.me"
+  ],
+  "verifiedAgainstLiveForm": "2026-09-18",
+  "detect": {
+    "any": [
+      "spl-form-field",
+      "#first-name-input",
+      "#hiring-manager-message-input"
+    ]
+  },
+  "meta": {
+    "company": [
+      "meta[property='og:site_name']",
+      "[data-test='company-name']"
+    ],
+    "role": [
+      "h1",
+      "meta[property='og:title']"
+    ]
+  },
+  "submit": [],
+  "confirm": [
+    "[data-test='application-confirmation']",
+    "spl-application-confirmation",
+    "[class*='confirmation']"
+  ],
+  "widgets": {
+    "combobox": {
+      "trigger": "[role='combobox'], spl-select",
+      "option": "[role='option'], spl-option"
+    }
+  },
+  "fields": [
+    {
+      "id": "first_name",
+      "selector": [
+        "#first-name-input"
+      ]
+    },
+    {
+      "id": "last_name",
+      "selector": [
+        "#last-name-input"
+      ]
+    },
+    {
+      "id": "email",
+      "selector": [
+        "#email-input"
+      ]
+    },
+    {
+      "id": "email",
+      "selector": [
+        "#confirm-email-input"
+      ]
+    },
+    {
+      "id": "linkedin_url",
+      "selector": [
+        "#linkedin-input"
+      ]
+    },
+    {
+      "id": "portfolio_url",
+      "selector": [
+        "#website-input"
+      ]
+    },
+    {
+      "id": "resume_file",
+      "selector": [
+        "#file-input",
+        "input[type='file']"
+      ]
+    },
+    {
+      "id": "cover_letter_text",
+      "selector": [
+        "#hiring-manager-message-input"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "id": "pinpoint",
+  "name": "Pinpoint",
+  "match": [
+    "pinpointhq.com"
+  ],
+  "verifiedAgainstLiveForm": "2026-09-18",
+  "detect": {
+    "any": [
+      "#application-form",
+      "form.external-form",
+      "input[name='application_form[application][first_name]']"
+    ]
+  },
+  "meta": {
+    "company": [
+      "meta[property='og:site_name']",
+      ".company-name"
+    ],
+    "role": [
+      "h1",
+      "meta[property='og:title']"
+    ]
+  },
+  "submit": [
+    "#application-form button[type='submit']",
+    "button[type='submit']"
+  ],
+  "confirm": [
+    ".application-confirmation",
+    "[data-application-submitted]"
+  ],
+  "widgets": {
+    "combobox": {
+      "trigger": "[role='combobox'], .select2-container",
+      "option": "[role='option'], .select2-results__option"
+    }
+  },
+  "fields": [
+    {
+      "id": "first_name",
+      "selector": [
+        "#application_form_application_first_name",
+        "input[name='application_form[application][first_name]']"
+      ]
+    },
+    {
+      "id": "last_name",
+      "selector": [
+        "#application_form_application_last_name",
+        "input[name='application_form[application][last_name]']"
+      ]
+    },
+    {
+      "id": "email",
+      "selector": [
+        "#application_form_application_email",
+        "input[name='application_form[application][email]']"
+      ]
+    },
+    {
+      "id": "phone",
+      "selector": [
+        "#application_form_application_phone",
+        "input[name='application_form[application][phone]']"
+      ]
+    },
+    {
+      "id": "linkedin_url",
+      "selector": [
+        "#application_form_application_linkedin_url",
+        "input[name='application_form[application][linkedin_url]']"
+      ]
+    },
+    {
+      "id": "full_address",
+      "selector": [
+        "#application_form_application_location",
+        "input[name='application_form[application][location]']"
+      ]
+    },
+    {
+      "id": "resume_file",
+      "selector": [
+        "input[type='file'][name='application_form[application][cv]']",
+        "input[type='file'][name*='[cv]']"
+      ]
+    },
+    {
+      "id": "cover_letter_file",
+      "selector": [
+        "input[type='file'][name*='cover_letter']"
+      ]
+    },
+    {
+      "id": "pronouns",
+      "selector": [
+        "#application_form_equality_monitoring_pronouns"
+      ]
+    },
+    {
+      "id": "privacy_consent",
+      "selector": [
+        "#application_process_information",
+        "input[name='application[process_information]']"
+      ]
+    }
+  ]
+}

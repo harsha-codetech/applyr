@@ -35,16 +35,28 @@ For a guided walkthrough with sample data, see [docs/DEMO.md](docs/DEMO.md).
 
 ## What works where
 
-**Bundled selector packs** (near-total coverage): Lever, Greenhouse, Ashby.
+**Bundled selector packs** (near-total coverage):
+
+| Pack | Checked against a live application form |
+|---|---|
+| Workable | yes, 18 Sep 2026 |
+| SmartRecruiters | yes, 18 Sep 2026 |
+| Pinpoint | yes, 18 Sep 2026 |
+| JazzHR | yes, 18 Sep 2026 |
+| Lever | fixture only |
+| Greenhouse | fixture only |
+| Ashby | fixture only |
+
+Each pack carries a `verifiedAgainstLiveForm` date, so the ones still written
+from knowledge rather than from a real DOM are visible rather than implied.
 
 **Generic mode** (no pack, ~70–90% coverage): every other site. The resolver
 falls back to `autocomplete` tokens, name/id patterns and visible label text, so
 an unknown ATS still fills most of the form. Verified against the legacy-style
 fixture at 92%.
 
-Manifest-declared hosts also include Workable, SmartRecruiters, Recruitee,
-BambooHR, JazzHR, Pinpoint, Teamtailor, Breezy, Workday and iCIMS — those run in
-generic mode until a pack is written for them.
+Manifest-declared hosts also include Recruitee, BambooHR, Teamtailor, Breezy,
+Workday and iCIMS — those run in generic mode until a pack is written for them.
 
 ## Develop
 

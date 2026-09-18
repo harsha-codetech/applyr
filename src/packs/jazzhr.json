@@ -1,0 +1,113 @@
+{
+  "id": "jazzhr",
+  "name": "JazzHR",
+  "match": [
+    "applytojob.com"
+  ],
+  "verifiedAgainstLiveForm": "2026-09-18",
+  "detect": {
+    "any": [
+      "#form_submit_new_resume",
+      "#resumator-firstname-value",
+      "form[data-test='form_submit_new_resume']"
+    ]
+  },
+  "meta": {
+    "company": [
+      "meta[property='og:site_name']",
+      "#resumator-logo img[alt]"
+    ],
+    "role": [
+      "h1",
+      ".job-title",
+      "meta[property='og:title']"
+    ]
+  },
+  "submit": [
+    "#form_submit_new_resume input[type='submit']",
+    "#form_submit_new_resume button[type='submit']",
+    "button[type='submit']"
+  ],
+  "confirm": [
+    ".resumator-thank-you",
+    "#resumator-application-complete"
+  ],
+  "widgets": {
+    "combobox": {
+      "trigger": "[role='combobox']",
+      "option": "[role='option']"
+    }
+  },
+  "fields": [
+    {
+      "id": "first_name",
+      "selector": [
+        "#resumator-firstname-value",
+        "input[name='resumator-firstname-value']"
+      ]
+    },
+    {
+      "id": "last_name",
+      "selector": [
+        "#resumator-lastname-value",
+        "input[name='resumator-lastname-value']"
+      ]
+    },
+    {
+      "id": "email",
+      "selector": [
+        "#resumator-email-value",
+        "input[name='resumator-email-value']"
+      ]
+    },
+    {
+      "id": "phone",
+      "selector": [
+        "#resumator-phone-value",
+        "input[name='resumator-phone-value']"
+      ]
+    },
+    {
+      "id": "address_line1",
+      "selector": [
+        "#resumator-address-value",
+        "input[name='resumator-address-value']"
+      ]
+    },
+    {
+      "id": "city",
+      "selector": [
+        "#resumator-city-value",
+        "input[name='resumator-city-value']"
+      ]
+    },
+    {
+      "id": "state",
+      "selector": [
+        "#resumator-state-value",
+        "input[name='resumator-state-value']"
+      ]
+    },
+    {
+      "id": "postal_code",
+      "selector": [
+        "#resumator-postal-value",
+        "input[name='resumator-postal-value']"
+      ]
+    },
+    {
+      "id": "resume_file",
+      "selector": [
+        "#resumator-resume-value",
+        "input[type='file'][name='resumator-resume-value']"
+      ]
+    },
+    {
+      "id": "cover_letter_text",
+      "selector": [
+        "#resumator-coverletter-value",
+        "textarea[name='resumator-coverletter-value']"
+      ]
+    }
+  ]
+}

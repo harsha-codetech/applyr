@@ -1,0 +1,106 @@
+{
+  "id": "workable",
+  "name": "Workable",
+  "match": [
+    "apply.workable.com",
+    "workable.com"
+  ],
+  "verifiedAgainstLiveForm": "2026-09-18",
+  "detect": {
+    "any": [
+      "form[data-ui='application-form']",
+      "[data-ui='application-form']",
+      "input[data-ui='firstname']"
+    ]
+  },
+  "meta": {
+    "company": [
+      "[data-ui='company-name']",
+      "meta[property='og:site_name']"
+    ],
+    "role": [
+      "[data-ui='job-title']",
+      "h1",
+      "meta[property='og:title']"
+    ]
+  },
+  "submit": [
+    "button[data-ui='apply-button']",
+    "button[type='submit']"
+  ],
+  "confirm": [
+    "[data-ui='application-submitted']",
+    "[data-ui='thank-you']"
+  ],
+  "widgets": {
+    "combobox": {
+      "trigger": "[role='combobox']",
+      "option": "[role='option']"
+    }
+  },
+  "fields": [
+    {
+      "id": "first_name",
+      "selector": [
+        "input[data-ui='firstname']",
+        "input[name='firstname']",
+        "#firstname"
+      ]
+    },
+    {
+      "id": "last_name",
+      "selector": [
+        "input[data-ui='lastname']",
+        "input[name='lastname']",
+        "#lastname"
+      ]
+    },
+    {
+      "id": "email",
+      "selector": [
+        "input[data-ui='email']",
+        "input[name='email']",
+        "#email"
+      ]
+    },
+    {
+      "id": "phone",
+      "selector": [
+        "input[name='phone']",
+        "input[data-ui='phone']"
+      ]
+    },
+    {
+      "id": "resume_file",
+      "selector": [
+        "input[type='file'][data-ui='resume']",
+        "input[type='file'][id*='files_input']"
+      ]
+    },
+    {
+      "id": "current_title",
+      "selector": [
+        "input[name='headline']"
+      ]
+    },
+    {
+      "id": "full_address",
+      "selector": [
+        "input[name='address']"
+      ]
+    },
+    {
+      "id": "cover_letter_text",
+      "selector": [
+        "textarea[name='cover_letter']",
+        "textarea[data-ui='cover_letter']"
+      ]
+    },
+    {
+      "id": "additional_info",
+      "selector": [
+        "textarea[name='summary']"
+      ]
+    }
+  ]
+}

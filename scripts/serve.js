@@ -41,7 +41,12 @@ http.createServer((req, res) => {
       res.writeHead(404, { 'content-type': 'text/plain' }).end('not found');
       return;
     }
-    res.writeHead(200, { 'content-type': TYPES[path.extname(file)] || 'application/octet-stream' });
+    res.writeHead(200, {
+      'content-type': TYPES[path.extname(file)] || 'application/octet-stream',
+      // Dev-only: lets the engine be imported into a live page for read-only
+      // selector checks (see tests/MANUAL.md). Never used by the extension.
+      'access-control-allow-origin': '*'
+    });
     res.end(data);
   });
 }).listen(PORT, () => {

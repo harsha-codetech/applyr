@@ -29,11 +29,23 @@ Measured on the fixtures: Lever 8/8 fillable, Greenhouse 7/7 (+2 correctly
 withheld as demographic), hard-mode 8/8 across both wizard steps, unknown
 legacy form 11/12.
 
-## v1.1 — next
+## v1.1 — in progress
 
-- **Wave-2 packs**: Workable, SmartRecruiters, Recruitee, BambooHR, JazzHR,
-  Pinpoint. ~0.5d each; these already run in generic mode, packs take them to
-  near-total.
+- **Wave-2 packs — done for four of six.** Workable, SmartRecruiters, Pinpoint
+  and JazzHR were each written against a live application form and their
+  selectors verified read-only in the browser on 18 Sep 2026.
+  - *Recruitee* and *BambooHR* are deferred: every company board reachable at
+    the time redirected to the vendor marketing site, so no live form could be
+    inspected. Rather than ship guessed selectors they stay in generic mode.
+    Revisit when a live board is available.
+  - Each pack now carries `verifiedAgainstLiveForm`, enforced by a test, so
+    fixture-only packs (Lever, Greenhouse, Ashby) are visibly distinguished from
+    live-verified ones.
+  - Note on SmartRecruiters: its apply flow is a wizard of `<spl-button>` custom
+    elements with no real submit button, and the only `button[type=submit]` on
+    the page is the cookie-settings control. Its `submit` list is therefore
+    deliberately empty so the tracker cannot log a false submission; detection
+    falls back to the confirmation-screen heuristic.
 - **Fixture capture command** — snapshot a live page into `fixtures/` so a pack
   can be written against a real DOM offline.
 - **Résumé-per-application** — pick which document goes with which posting
