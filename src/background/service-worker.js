@@ -161,21 +161,19 @@ async function resolveFileFor(fieldId) {
 
 async function logApplication(meta, { status, counts }) {
   if (!meta || !meta.url) return null;
-  const existing = await store.findApplicationByUrl(meta.url);
   const profile = await store.getProfile();
-  const patch = {
-    id: existing ? existing.id : undefined,
-    company: meta.company || (existing && existing.company) || '',
-    role: meta.role || (existing && existing.role) || '',
-    url: meta.url,
-    ats: meta.ats || '',
-    status,
-    resumeId: profile.settings.defaultResumeId || null,
-    fieldsFilled: counts ? counts.filled : (existing && existing.fieldsFilled) || 0
-  };
-  // Never downgrade a submitted application back to "filled".
-  if (existing && existing.status === 'submitted' && status === 'filled') patch.status = 'submitted';
-  const list = await store.upsertApplication(patch);
+
+  // Only send the keys we actually know: upsertApplicationByUrl merges onto the
+  // existing row, so omitting an empty company keeps whatever was learned
+  // earlier rather than blanking it. The find-and-write is atomic there, which
+  // matters because every frame of a page reports independently.
+  const patch = { url: meta.url, status, resumeId: profile.settings.defaultResumeId || null };
+  if (meta.company) patch.company = meta.company;
+  if (meta.role) patch.role = meta.role;
+  if (meta.ats) patch.ats = meta.ats;
+  if (counts) patch.fieldsFilled = counts.filled;
+
+  const list = await store.upsertApplicationByUrl(patch);
   notifyPanel({ type: MSG.STATE_CHANGED, what: 'applications' });
   return list;
 }

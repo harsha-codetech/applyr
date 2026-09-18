@@ -66,6 +66,7 @@ Workday and iCIMS — those run in generic mode until a pack is written for them
 ```bash
 npm test          # 31 engine tests, no dependencies
 npm run serve     # fixtures at http://localhost:5173/fixtures/
+npm run e2e       # loads the extension into real Chrome and drives it over CDP
 npm run zip       # dist/applyr-<version>.zip for the Web Store
 ```
 
@@ -74,6 +75,10 @@ exercised without sending anything to a real employer. `fixtures/hard-mode.html`
 reproduces the three things that break naive autofill: a framework-controlled
 input that reverts unauthorised writes, a field inside a shadow root, and a
 wizard step that only exists after a click.
+
+Chrome 137+ ignores `--load-extension`, so `npm run e2e` installs the extension
+over the DevTools Protocol instead and then drives it: service worker, side
+panel, content script, fill, upload and tracker. Start `npm run serve` first.
 
 See [tests/MANUAL.md](tests/MANUAL.md) for the browser checklist and
 [docs/DESIGN.md](docs/DESIGN.md) for how the engine works.

@@ -190,6 +190,19 @@ export function buildPlan(descriptors, ctx) {
         plan.push(entry);
         continue;
       }
+      if (def && def.type === 'file') {
+        // Documents live in the vault, not in the profile's values map, so there
+        // is nothing to look up here - the file adapter fetches the bytes
+        // lazily. Gating this on `values` silently skipped every resume upload.
+        entry.value = null;
+        if (desc.hasValue && !settings.overwriteExisting) {
+          entry.outcome = OUTCOME.SKIPPED;
+          entry.reason = 'A file is already attached';
+        }
+        plan.push(entry);
+        continue;
+      }
+
       let raw = values[fieldId];
       if (raw === undefined || raw === null || raw === '') {
         // No stored value for a recognised field - memory may still know it.

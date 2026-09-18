@@ -7,7 +7,8 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "zip": "node scripts/package.js",
-    "serve": "node scripts/serve.js"
+    "serve": "node scripts/serve.js",
+    "e2e": "node scripts/e2e.js"
   },
   "engines": {
     "node": ">=20"

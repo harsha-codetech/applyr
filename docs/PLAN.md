@@ -29,6 +29,30 @@ Measured on the fixtures: Lever 8/8 fillable, Greenhouse 7/7 (+2 correctly
 withheld as demographic), hard-mode 8/8 across both wizard steps, unknown
 legacy form 11/12.
 
+## First run in real Chrome — done
+
+`npm run e2e` installs the extension into a real Chrome over the DevTools
+Protocol and drives it end to end: 23 checks, all passing. Chrome 137+ silently
+ignores `--load-extension`, so `Extensions.loadUnpacked` is used instead, behind
+`--enable-unsafe-extension-debugging`.
+
+The first run found three bugs that no unit test or fixture could have caught:
+
+- **Backup and restore were completely broken.** `exportAll` and `importAll`
+  used `await import('./util.js')`, and dynamic import is forbidden in a service
+  worker by the HTML spec. Both threw on every call — in the one feature the
+  README calls the user's only backup. Now statically imported.
+- **The resume was never attached, anywhere.** The resolver looked for
+  `values.resume_file`, but documents live in the vault, not in the values map,
+  so every upload was marked skipped before the adapter could consult the
+  vault. The fixture runs had recorded that as expected output, which is why it
+  went unnoticed. Generic-mode coverage went from 92% to 100% once fixed.
+- **The tracker duplicated entries.** find-by-url and write were two separate
+  awaits, so two frames of one page each created their own row. With
+  `all_frames` enabled that is the normal case on an iframe-embedded Greenhouse.
+  All read-modify-write storage operations are now serialized through one
+  promise chain, and the find-and-write is a single atomic call.
+
 ## Live verification of wave-1 — done
 
 Lever, Greenhouse and Ashby were re-checked against real postings on 18 Sep 2026

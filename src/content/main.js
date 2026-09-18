@@ -167,7 +167,10 @@ async function doFill({ only = null } = {}) {
     state.lastResults = results;
     const counts = tally(results);
 
-    safeSend({
+    // Awaited so a caller that resolves on `fill` knows the tracker has already
+    // been updated - otherwise a fill that finishes and a tracker that has not
+    // caught up look identical from outside.
+    await safeSend({
       type: MSG.FILL_RESULT,
       frameUrl: location.href,
       counts,

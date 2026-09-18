@@ -9,7 +9,7 @@
  */
 
 import { defaultProfile, migrateProfile, validateProfile } from './schema.js';
-import { uid, questionKey, bestMatch } from './util.js';
+import { uid, questionKey, bestMatch, bufToBase64, base64ToBytes } from './util.js';
 
 const K_PROFILE = 'profile';
 const K_MEMORY = 'memory';
@@ -34,6 +34,24 @@ async function set(key, value) {
   return value;
 }
 
+/**
+ * Read-modify-write serialization.
+ *
+ * Most writes here read a list, mutate it and write it back. Because content
+ * scripts run in every frame, two frames of the same page report their results
+ * milliseconds apart - and both would read the list before either wrote,
+ * producing duplicate tracker entries. Chaining every mutating call through one
+ * promise removes the interleaving.
+ */
+let writeChain = Promise.resolve();
+function serialize(fn) {
+  const run = writeChain.then(fn, fn);
+  writeChain = run.then(() => undefined, () => undefined);
+  return run;
+}
+
+const cleanUrl = (u) => String(u || '').split('#')[0];
+
 // ---------------------------------------------------------------------------
 // Profile
 // ---------------------------------------------------------------------------
@@ -51,16 +69,20 @@ export async function saveProfile(profile) {
   return next;
 }
 
-export async function patchProfileValues(patch) {
-  const p = await getProfile();
-  p.values = { ...p.values, ...patch };
-  return saveProfile(p);
+export function patchProfileValues(patch) {
+  return serialize(async () => {
+    const p = await getProfile();
+    p.values = { ...p.values, ...patch };
+    return saveProfile(p);
+  });
 }
 
-export async function patchSettings(patch) {
-  const p = await getProfile();
-  p.settings = { ...p.settings, ...patch };
-  return saveProfile(p);
+export function patchSettings(patch) {
+  return serialize(async () => {
+    const p = await getProfile();
+    p.settings = { ...p.settings, ...patch };
+    return saveProfile(p);
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -79,61 +101,69 @@ export async function allMemory() {
 /**
  * @param {{question: string, answer: string, fieldId?: string|null, type?: string}} entry
  */
-export async function rememberAnswer(entry) {
-  const list = await allMemory();
-  const key = questionKey(entry.question);
-  if (!key) return list;
+export function rememberAnswer(entry) {
+  return serialize(async () => {
+    const list = await allMemory();
+    const key = questionKey(entry.question);
+    if (!key) return list;
 
-  const existing = list.find((e) => e.key === key);
-  if (existing) {
-    existing.answer = entry.answer;
-    existing.fieldId = entry.fieldId ?? existing.fieldId ?? null;
-    existing.type = entry.type || existing.type || 'text';
-    existing.updatedAt = new Date().toISOString();
-  } else {
-    list.push({
-      id: uid(),
-      key,
-      question: entry.question,
-      answer: entry.answer,
-      fieldId: entry.fieldId ?? null,
-      type: entry.type || 'text',
-      uses: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    });
-  }
-  await set(K_MEMORY, list);
-  return list;
+    const existing = list.find((e) => e.key === key);
+    if (existing) {
+      existing.answer = entry.answer;
+      existing.fieldId = entry.fieldId ?? existing.fieldId ?? null;
+      existing.type = entry.type || existing.type || 'text';
+      existing.updatedAt = new Date().toISOString();
+    } else {
+      list.push({
+        id: uid(),
+        key,
+        question: entry.question,
+        answer: entry.answer,
+        fieldId: entry.fieldId ?? null,
+        type: entry.type || 'text',
+        uses: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    }
+    await set(K_MEMORY, list);
+    return list;
+  });
 }
 
-export async function updateMemory(id, patch) {
-  const list = await allMemory();
-  const e = list.find((x) => x.id === id);
-  if (!e) return list;
-  Object.assign(e, patch, { updatedAt: new Date().toISOString() });
-  await set(K_MEMORY, list);
-  return list;
+export function updateMemory(id, patch) {
+  return serialize(async () => {
+    const list = await allMemory();
+    const e = list.find((x) => x.id === id);
+    if (!e) return list;
+    Object.assign(e, patch, { updatedAt: new Date().toISOString() });
+    await set(K_MEMORY, list);
+    return list;
+  });
 }
 
-export async function deleteMemory(id) {
-  const list = (await allMemory()).filter((x) => x.id !== id);
-  await set(K_MEMORY, list);
-  return list;
+export function deleteMemory(id) {
+  return serialize(async () => {
+    const list = (await allMemory()).filter((x) => x.id !== id);
+    await set(K_MEMORY, list);
+    return list;
+  });
 }
 
 /** Record that a remembered answer was actually used, for the "most reused" view. */
-export async function bumpMemoryUses(ids) {
-  if (!ids || !ids.length) return;
-  const list = await allMemory();
-  let touched = false;
-  for (const e of list) {
-    if (ids.includes(e.id)) {
-      e.uses = (e.uses || 0) + 1;
-      touched = true;
+export function bumpMemoryUses(ids) {
+  if (!ids || !ids.length) return Promise.resolve();
+  return serialize(async () => {
+    const list = await allMemory();
+    let touched = false;
+    for (const e of list) {
+      if (ids.includes(e.id)) {
+        e.uses = (e.uses || 0) + 1;
+        touched = true;
+      }
     }
-  }
-  if (touched) await set(K_MEMORY, list);
+    if (touched) await set(K_MEMORY, list);
+  });
 }
 
 /**
@@ -160,59 +190,90 @@ export async function listApplications() {
   return get(K_APPS, []);
 }
 
-export async function upsertApplication(app) {
-  const list = await listApplications();
-  const idx = app.id ? list.findIndex((a) => a.id === app.id) : -1;
-  if (idx >= 0) {
-    list[idx] = { ...list[idx], ...app, updatedAt: new Date().toISOString() };
-  } else {
-    list.unshift({
-      id: uid(),
-      company: '',
-      role: '',
-      url: '',
-      ats: '',
-      status: 'filled',
-      resumeId: null,
-      notes: '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      ...app
-    });
-  }
-  await set(K_APPS, list);
-  return list;
+function newApplication(app) {
+  return {
+    id: uid(),
+    company: '',
+    role: '',
+    url: '',
+    ats: '',
+    status: 'filled',
+    resumeId: null,
+    notes: '',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    ...app
+  };
+}
+
+/** Edit an existing entry by id, or add a new one. Used by the panel. */
+export function upsertApplication(app) {
+  return serialize(async () => {
+    const list = await listApplications();
+    const idx = app.id ? list.findIndex((a) => a.id === app.id) : -1;
+    if (idx >= 0) list[idx] = { ...list[idx], ...app, updatedAt: new Date().toISOString() };
+    else list.unshift(newApplication(app));
+    await set(K_APPS, list);
+    return list;
+  });
+}
+
+/**
+ * Log a fill or a submission against a page URL, atomically.
+ *
+ * The find-then-write must happen inside one critical section: doing it as two
+ * awaits let two frames of the same page each create their own entry.
+ */
+export function upsertApplicationByUrl(app) {
+  return serialize(async () => {
+    const list = await listApplications();
+    const target = cleanUrl(app.url);
+    const existing = list.find((a) => cleanUrl(a.url) === target);
+    if (existing) {
+      const status = existing.status === 'submitted' && app.status === 'filled'
+        ? 'submitted' // never walk a submitted application back to "filled"
+        : app.status || existing.status;
+      Object.assign(existing, app, { id: existing.id, status, updatedAt: new Date().toISOString() });
+    } else {
+      list.unshift(newApplication(app));
+    }
+    await set(K_APPS, list);
+    return list;
+  });
 }
 
 /** Find an existing entry for this page so one application does not log twice. */
 export async function findApplicationByUrl(url) {
   const list = await listApplications();
-  const clean = String(url || '').split('#')[0];
-  return list.find((a) => String(a.url || '').split('#')[0] === clean) || null;
+  return list.find((a) => cleanUrl(a.url) === cleanUrl(url)) || null;
 }
 
-export async function deleteApplication(id) {
-  const list = (await listApplications()).filter((a) => a.id !== id);
-  await set(K_APPS, list);
-  return list;
+export function deleteApplication(id) {
+  return serialize(async () => {
+    const list = (await listApplications()).filter((a) => a.id !== id);
+    await set(K_APPS, list);
+    return list;
+  });
 }
 
 // ---------------------------------------------------------------------------
 // Per-site fill statistics - drives "this site needs a pack" reporting
 // ---------------------------------------------------------------------------
 
-export async function recordSiteRun(host, { filled, skipped, failed, unresolved }) {
-  const stats = await get(K_SITES, {});
-  const s = stats[host] || { runs: 0, filled: 0, skipped: 0, failed: 0, unresolved: 0 };
-  s.runs += 1;
-  s.filled += filled;
-  s.skipped += skipped;
-  s.failed += failed;
-  s.unresolved += unresolved;
-  s.lastRun = new Date().toISOString();
-  stats[host] = s;
-  await set(K_SITES, stats);
-  return s;
+export function recordSiteRun(host, { filled, skipped, failed, unresolved }) {
+  return serialize(async () => {
+    const stats = await get(K_SITES, {});
+    const s = stats[host] || { runs: 0, filled: 0, skipped: 0, failed: 0, unresolved: 0 };
+    s.runs += 1;
+    s.filled += filled;
+    s.skipped += skipped;
+    s.failed += failed;
+    s.unresolved += unresolved;
+    s.lastRun = new Date().toISOString();
+    stats[host] = s;
+    await set(K_SITES, stats);
+    return s;
+  });
 }
 
 export async function siteStats() {
@@ -324,7 +385,6 @@ export async function exportAll({ includeFiles = true } = {}) {
     files: []
   };
   if (includeFiles) {
-    const { bufToBase64 } = await import('./util.js');
     const metas = await listFiles();
     for (const m of metas) {
       const rec = await getFile(m.id);
@@ -338,8 +398,6 @@ export async function importAll(bundle, { merge = false } = {}) {
   if (!bundle || bundle.format !== 'applyr-export') {
     throw new Error('Not an applyr export file');
   }
-  const { base64ToBytes } = await import('./util.js');
-
   if (bundle.profile) {
     const incoming = migrateProfile(bundle.profile);
     if (merge) {

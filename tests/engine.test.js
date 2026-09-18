@@ -283,6 +283,28 @@ test('file inputs only ever claim file fields', () => {
   assert.equal(plan[0].fieldId, 'resume_file');
 });
 
+test('a file field is left for the adapter, not skipped for having no value', () => {
+  // Regression: documents live in the vault, not in the profile's values map.
+  // Gating the plan on `values.resume_file` marked every upload "skipped" and
+  // the resume was silently never attached - on every site, for every user.
+  const d = [desc({ kind: 'file', attrs: 'resume', label: 'Resume/CV', accept: '.pdf' })];
+  const plan = buildPlan(d, baseCtx({ values: {} }));
+  assert.equal(plan[0].fieldId, 'resume_file');
+  assert.equal(plan[0].outcome, null, 'must reach the adapter so the vault can be consulted');
+});
+
+test('a file field that already holds a document is left alone', () => {
+  const d = [desc({ kind: 'file', attrs: 'resume', label: 'Resume/CV', current: 'mine.pdf', hasValue: true })];
+  const plan = buildPlan(d, baseCtx({ values: {} }));
+  assert.equal(plan[0].outcome, OUTCOME.SKIPPED);
+
+  const forced = buildPlan(d, baseCtx({
+    values: {},
+    settings: { fillSensitive: false, overwriteExisting: true }
+  }));
+  assert.equal(forced[0].outcome, null);
+});
+
 // ---------------------------------------------------------------------------
 // detector guards
 // ---------------------------------------------------------------------------

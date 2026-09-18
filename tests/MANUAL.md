@@ -6,7 +6,16 @@ comboboxes, shadow roots, uploads. That is what the fixtures are for.
 
 ```bash
 npm run serve     # http://localhost:5173/fixtures/
+npm run e2e       # automated: installs into real Chrome and drives 23 checks
 ```
+
+Run `npm run e2e` first — it covers most of this list automatically. What follows
+is for the parts a script cannot judge: whether the result looks right to a
+person, and whether anything feels wrong.
+
+Note: Chrome 137+ ignores `--load-extension` entirely. To load applyr by hand,
+turn on Developer mode at `chrome://extensions` and use **Load unpacked**; the
+command-line switch will silently do nothing.
 
 Load the extension unpacked, then open the side panel and grant access to
 `http://localhost:5173` from **This page → Enable applyr on this site**.
