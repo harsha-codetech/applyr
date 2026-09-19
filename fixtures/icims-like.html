@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Principal Data Engineer | Careers</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; margin: 0; background: #f4f6f8; }
+      .brand { background: #0b2e4f; color: #fff; padding: 14px 24px; font-weight: 600; }
+      .outer { max-width: 760px; margin: 24px auto; padding: 0 20px; }
+      .note { background: #fff8e1; border-left: 3px solid #d97706; padding: 8px 12px; font-size: 13px; margin-bottom: 16px; }
+      iframe { width: 100%; height: 460px; border: 1px solid #d7dde3; border-radius: 6px; background: #fff; }
+    </style>
+  </head>
+  <body>
+    <div class="brand">Careers</div>
+    <div class="outer">
+      <p class="note">
+        Reproduces iCIMS: the whole application lives inside
+        <code>#icims_content_iframe</code>, so applyr only reaches it because the
+        manifest sets <code>all_frames</code>. The first step is email plus a
+        consent box, and the page carries an hCaptcha rendered as a real
+        <code>&lt;textarea&gt;</code> that must never be filled.
+      </p>
+      <iframe id="icims_content_iframe" src="icims-inner.html" title="Application"></iframe>
+    </div>
+  </body>
+</html>

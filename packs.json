@@ -1412,6 +1412,175 @@
           ]
         }
       ]
+    },
+    {
+      "id": "icims",
+      "name": "iCIMS",
+      "match": [
+        "icims.com"
+      ],
+      "verifiedAgainstLiveForm": null,
+      "notes": [
+        "PARTIALLY VERIFIED, and the unverified part is most of the form.",
+        "",
+        "Confirmed against a live iCIMS tenant on 19 Sep 2026:",
+        "  - The entire application renders inside <iframe id='icims_content_iframe'>,",
+        "    pointing at the same host with ?in_iframe=1. applyr only reaches it because",
+        "    the manifest sets all_frames; without that there is nothing to fill.",
+        "  - The application opens on a two-field step titled 'Enter Your Information':",
+        "    input[name='css_loginName'] (email) and input[name='accept_privacy'] (consent),",
+        "    submitted with #enterEmailSubmitButton. Those two selectors are real.",
+        "  - The page carries an hCaptcha, rendered as a real <textarea> named",
+        "    h-captcha-response. The detector ignores captcha controls, so it is never",
+        "    filled - see isIgnored() in content/detector.js.",
+        "  - Form fields use a css_ prefix. That convention is confirmed; the individual",
+        "    names below are NOT.",
+        "",
+        "NOT verified: everything after the email step. iCIMS requires an account before",
+        "the application form renders, so the personal-information, resume and EEO pages",
+        "have not been seen by this code. The css_* selectors below follow iCIMS's naming",
+        "convention and cannot mis-map - an exact name that does not exist simply does not",
+        "match - but expect to correct them on a first real application. Generic mode",
+        "carries these pages in the meantime; iCIMS labels its fields properly, which is",
+        "what generic mode needs.",
+        "",
+        "About accept_privacy: this is a consent checkbox, and applyr only ticks it when",
+        "the user has set privacy_consent to yes in their own profile. It is their saved",
+        "answer, not an assumption - but it is worth knowing that it gets filled.",
+        "",
+        "submit is empty on purpose. The email step's button is not an application",
+        "submission, and iCIMS spreads the real submit across later pages, so matching a",
+        "button here would log an application that was never sent."
+      ],
+      "detect": {
+        "any": [
+          "input[name='css_loginName']",
+          "#enterEmailSubmitButton",
+          "[id^='icims_'][id$='_form']",
+          "form[action*='icims.com']",
+          "#icims_content_iframe"
+        ]
+      },
+      "meta": {
+        "company": [
+          "meta[property='og:site_name']",
+          "#icims_logo img[alt]"
+        ],
+        "role": [
+          "h1",
+          ".iCIMS_Header",
+          "meta[property='og:title']"
+        ]
+      },
+      "submit": [],
+      "confirm": [
+        ".iCIMS_SubmittedConfirmation",
+        "[id*='confirmation' i]"
+      ],
+      "widgets": {
+        "combobox": {
+          "trigger": "[role='combobox'], .iCIMS_Dropdown",
+          "option": "[role='option'], .iCIMS_DropdownOption"
+        }
+      },
+      "fields": [
+        {
+          "id": "email",
+          "selector": [
+            "input[name='css_loginName']",
+            "input[name='css_email']",
+            "#email"
+          ]
+        },
+        {
+          "id": "privacy_consent",
+          "selector": [
+            "input[name='accept_privacy']",
+            "#accept_privacy"
+          ]
+        },
+        {
+          "id": "first_name",
+          "selector": [
+            "input[name='css_firstname']",
+            "input[name='css_firstName']"
+          ]
+        },
+        {
+          "id": "last_name",
+          "selector": [
+            "input[name='css_lastname']",
+            "input[name='css_lastName']"
+          ]
+        },
+        {
+          "id": "phone",
+          "selector": [
+            "input[name='css_phone']",
+            "input[name='css_homephone']"
+          ]
+        },
+        {
+          "id": "address_line1",
+          "selector": [
+            "input[name='css_addressline1']",
+            "input[name='css_address']"
+          ]
+        },
+        {
+          "id": "city",
+          "selector": [
+            "input[name='css_city']"
+          ]
+        },
+        {
+          "id": "state",
+          "selector": [
+            "input[name='css_state']",
+            "select[name='css_state']"
+          ]
+        },
+        {
+          "id": "postal_code",
+          "selector": [
+            "input[name='css_zip']",
+            "input[name='css_postalcode']"
+          ]
+        },
+        {
+          "id": "country",
+          "selector": [
+            "select[name='css_country']"
+          ]
+        },
+        {
+          "id": "resume_file",
+          "selector": [
+            "input[type='file'][name*='resume' i]",
+            "input[type='file'][id*='resume' i]",
+            "input[type='file'][name='css_resume']"
+          ]
+        },
+        {
+          "id": "cover_letter_file",
+          "selector": [
+            "input[type='file'][name*='cover' i]"
+          ]
+        },
+        {
+          "id": "linkedin_url",
+          "selector": [
+            "input[name*='linkedin' i]"
+          ]
+        },
+        {
+          "id": "how_did_you_hear",
+          "selector": [
+            "select[name='css_source']",
+            "input[name='css_source']"
+          ]
+        }
+      ]
     }
   ]
 }

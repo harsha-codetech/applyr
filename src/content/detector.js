@@ -493,13 +493,28 @@ export function scan(root = document) {
   return descriptors;
 }
 
-/** Heuristic: does this page look like a job application rather than a login? */
-export function looksLikeApplication(descriptors, doc = document) {
+/**
+ * Heuristic: does this page look like a job application rather than a login?
+ *
+ * @param {Array} descriptors
+ * @param {Document} doc
+ * @param {{packMatched?: boolean}} [opts] whether a site-specific pack claimed
+ *        this page by DOM fingerprint, which is much stronger evidence than any
+ *        of the guesses below
+ */
+export function looksLikeApplication(descriptors, doc = document, opts = {}) {
   // A job application never asks for a password. Workday's apply flow opens on
   // an account-creation step that is otherwise indistinguishable from a form -
   // same wizard chrome, same progress bar, "step 1 of 6" - and filling it would
-  // mean typing the user's details into a credential screen.
+  // mean typing the user's details into a credential screen. This outranks
+  // everything below, including a pack match.
   if (doc.querySelector && doc.querySelector('input[type="password"]')) return false;
+
+  // A pack recognised the page, so stop guessing. iCIMS opens its application
+  // with a two-field step - email plus a consent box - which the field-count
+  // heuristic below would dismiss even though it is the first page of the
+  // application proper.
+  if (opts.packMatched && descriptors.length >= 1) return true;
 
   if (descriptors.length < 3) return false;
   const hasFile = descriptors.some((d) => d.kind === 'file');

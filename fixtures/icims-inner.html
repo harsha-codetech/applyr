@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Login</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; margin: 0; padding: 22px; }
+      h2 { margin-top: 0; font-size: 19px; }
+      .field { margin-bottom: 16px; max-width: 420px; }
+      label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+      input[type="email"] { width: 100%; padding: 8px; border: 1px solid #b7bfc7; border-radius: 4px; font: inherit; }
+      .consent { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; max-width: 460px; }
+      .captcha { margin: 18px 0; padding: 10px; border: 1px dashed #c4ccd4; border-radius: 4px; font-size: 12px; color: #6b7681; max-width: 420px; }
+      input[type="submit"] { padding: 9px 20px; font: inherit; font-weight: 600; border: 0; border-radius: 4px; background: #0b62c4; color: #fff; }
+    </style>
+  </head>
+  <body>
+    <h2>Enter Your Information</h2>
+    <p style="font-size:13px;color:#5f6b7a">
+      Please contact us if you need assistance with the application process.
+    </p>
+
+    <form id="icims_application_form">
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="css_loginName" />
+      </div>
+
+      <div class="field consent">
+        <input type="checkbox" id="accept_privacy" name="accept_privacy" />
+        <label for="accept_privacy" style="font-weight:400">
+          I consent to the processing of my personal data in accordance with the
+          Applicant Privacy Notice.
+        </label>
+      </div>
+
+      <!--
+        hCaptcha, exactly as iCIMS renders it: a real textarea with a name. Left
+        unstyled-hidden here so the fixture can assert applyr never writes to it.
+      -->
+      <div class="captcha">
+        hCaptcha widget
+        <textarea name="h-captcha-response" id="h-captcha-response-0h9rn7pvubb"
+                  style="width:100%;height:28px"></textarea>
+      </div>
+
+      <input type="submit" id="enterEmailSubmitButton" value="Continue" />
+    </form>
+
+    <script>
+      document.getElementById('icims_application_form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Fixture form: submission blocked.');
+      });
+    </script>
+  </body>
+</html>

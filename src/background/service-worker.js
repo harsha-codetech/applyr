@@ -287,7 +287,20 @@ async function handle(msg, sender) {
     // ---- from content scripts -------------------------------------------
     case MSG.SCAN_RESULT: {
       if (tabId == null) return { ok: false };
+
+      // Every frame reports independently, and on an iframe-embedded board the
+      // wrapper page has no fields at all - letting it write last would erase
+      // the child frame's "12 fields, Greenhouse pack" with "nothing here".
+      // The frame that found the most keeps the tab, and any frame may always
+      // update its own report.
+      const frameId = sender.frameId || 0;
+      const prior = await getTabState(tabId);
+      if (prior && prior.frameId !== frameId && (prior.fieldCount || 0) > msg.fieldCount) {
+        return { ok: true, deferred: true };
+      }
+
       await setTabState(tabId, {
+        frameId,
         url: msg.frameUrl,
         isApplication: msg.isApplication,
         fieldCount: msg.fieldCount,

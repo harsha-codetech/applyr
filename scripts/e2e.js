@@ -549,6 +549,55 @@ async function main() {
     const noNav = await cdp.evaluate(bPage, 'return location.href;');
     check('applyr did not navigate the board page', noNav.includes('naukri-like.html'), noNav.slice(-28));
 
+    // 10b. iCIMS: the form lives in an iframe --------------------------------
+    console.log('\n--- icims (iframe) ---');
+    const ic = `${FIXTURE_ORIGIN}/fixtures/icims-like.html`;
+    const { targetId: icId } = await cdp.send('Target.createTarget', { url: ic });
+    const { sessionId: icPage } = await cdp.send('Target.attachToTarget', { targetId: icId, flatten: true });
+    await cdp.send('Runtime.enable', {}, icPage);
+    await sleep(2600);
+
+    // The outer document has no fields at all; everything is in the child frame,
+    // which only gets a content script because the manifest sets all_frames.
+    // No frameId games: the message goes to every frame, the wrapper has nothing
+    // to fill, and the child frame does the work. The DOM is the real assertion.
+    await cdp.evaluate(sw, `
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(t => t.url && t.url.includes('icims-like'));
+      try { await chrome.tabs.sendMessage(tab.id, { type: 'fill' }); } catch (e) { /* one frame may refuse */ }
+      return true;
+    `);
+    await sleep(1200);
+
+    const icDom = await cdp.evaluate(icPage, `
+      const d = document.getElementById('icims_content_iframe').contentDocument;
+      const el = (sel) => d.querySelector(sel);
+      return {
+        email: el("input[name='css_loginName']").value,
+        consent: el("input[name='accept_privacy']").checked,
+        captcha: el("textarea[name='h-captcha-response']").value
+      };
+    `);
+    check('the iframed application is reached and filled',
+      icDom.email === 'ada.lovelace@example.com' && icDom.consent === true,
+      `email="${icDom.email}", consent=${icDom.consent}`);
+    check('the hCaptcha textarea was never touched', icDom.captcha === '',
+      icDom.captcha === '' ? 'empty' : `FILLED WITH "${icDom.captcha}"`);
+
+    const icState = await cdp.evaluate(sw, `
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(t => t.url && t.url.includes('icims-like'));
+      try { await chrome.tabs.sendMessage(tab.id, { type: 'scan' }); } catch (e) { /* ignore */ }
+      await new Promise(r => setTimeout(r, 500));
+      const out = await chrome.storage.session.get('tab:' + tab.id);
+      return out['tab:' + tab.id] || null;
+    `);
+    check('the frame that found the form owns the tab state',
+      Boolean(icState) && icState.isApplication === true && icState.pack === 'icims' && icState.fieldCount >= 2,
+      icState
+        ? `pack=${icState.pack}, ${icState.fieldCount} fields, isApplication=${icState.isApplication}`
+        : 'no tab state');
+
     // 11. remote selector packs ---------------------------------------------
     console.log('\n--- remote packs ---');
 

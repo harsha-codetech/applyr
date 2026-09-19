@@ -103,7 +103,9 @@ async function doScan({ announce = true } = {}) {
       state.via = picked.via;
     }
     state.descriptors = scan(document);
-    const isApp = looksLikeApplication(state.descriptors, document);
+    const isApp = looksLikeApplication(state.descriptors, document, {
+      packMatched: Boolean(state.pack)
+    });
     state.meta = readMeta();
 
     // Assisted mode: if this host is a job board we know how to read, parse the
