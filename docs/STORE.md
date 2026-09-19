@@ -88,7 +88,7 @@ Certifications required by the form:
 - [x] Does not use or transfer data for purposes unrelated to the single purpose
 - [x] Does not use or transfer data to determine creditworthiness or for lending
 
-**Privacy policy URL** — host `docs/PRIVACY.md` as a public page and link it.
+**Privacy policy URL** — `https://harsha-codetech.github.io/applyr/privacy.html`
 
 ## Remote code
 

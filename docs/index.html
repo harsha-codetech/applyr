@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>applyr — job application autofill</title>
+    <style>
+      :root { --text: #1a1a1a; --muted: #555; --bg: #fff; --line: #e5e7eb; --accent: #2563eb; }
+      @media (prefers-color-scheme: dark) {
+        :root { --text: #e5e7eb; --muted: #9ca3af; --bg: #111; --line: #333; --accent: #60a5fa; }
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 16px/1.7 system-ui, -apple-system, sans-serif; color: var(--text); background: var(--bg); padding: 0 20px; }
+      main { max-width: 680px; margin: 48px auto 80px; }
+      h1 { font-size: 28px; letter-spacing: -0.02em; margin-bottom: 6px; }
+      .tagline { color: var(--muted); font-size: 17px; margin-bottom: 32px; }
+      .card { border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; margin-bottom: 14px; text-decoration: none; color: inherit; display: block; }
+      .card:hover { border-color: var(--accent); }
+      .card b { display: block; font-size: 15px; }
+      .card span { font-size: 14px; color: var(--muted); }
+      .btn { display: inline-block; background: var(--accent); color: #fff; padding: 10px 22px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; margin-top: 8px; }
+      .btn:hover { opacity: 0.9; }
+      .features { margin: 28px 0; font-size: 15px; }
+      .features li { margin-bottom: 8px; }
+      p { margin-bottom: 14px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>applyr</h1>
+      <p class="tagline">
+        A Chrome extension that fills job applications from one profile you control.
+        No account, no server, no telemetry.
+      </p>
+
+      <a class="btn" href="https://github.com/harsha-codetech/applyr">Install from GitHub</a>
+
+      <ul class="features">
+        <li><strong>11 ATS packs</strong> &mdash; Lever, Greenhouse, Ashby, Workable, SmartRecruiters, Pinpoint, JazzHR, Recruitee, BambooHR, Workday, iCIMS</li>
+        <li><strong>Generic mode</strong> &mdash; falls back to label matching on any other career site</li>
+        <li><strong>Job board ranking</strong> &mdash; scores Naukri listings against your profile</li>
+        <li><strong>Question memory</strong> &mdash; learns screening answers and recalls them across employers</li>
+        <li><strong>100% on-device</strong> &mdash; no network requests unless you opt into selector updates</li>
+        <li><strong>Never submits</strong> &mdash; fills, verifies, and reports; you click Submit</li>
+      </ul>
+
+      <a class="card" href="privacy.html">
+        <b>Privacy Policy</b>
+        <span>What is stored, what is not collected, how network activity works.</span>
+      </a>
+
+      <a class="card" href="https://github.com/harsha-codetech/applyr">
+        <b>Source Code</b>
+        <span>GitHub repository &mdash; clone and load unpacked, no build step needed.</span>
+      </a>
+
+      <a class="card" href="https://github.com/harsha-codetech/applyr/blob/main/docs/DEMO.md">
+        <b>Demo Guide</b>
+        <span>Five-minute walkthrough with sample data.</span>
+      </a>
+    </main>
+  </body>
+</html>

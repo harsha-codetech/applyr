@@ -179,7 +179,8 @@ turn it on: **pack updates** fetch a static JSON file of CSS selectors so a
 broken ATS selector can be fixed without a store update. That request carries no
 identifier, no cookies and nothing about you or your applications, it needs its
 own permission which is only requested when you enable it, and everything
-fetched is validated before use. See [docs/PRIVACY.md](docs/PRIVACY.md).
+fetched is validated before use. See the full
+[privacy policy](https://harsha-codetech.github.io/applyr/privacy.html).
 
 ## Layout
 

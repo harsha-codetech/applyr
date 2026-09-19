@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy — applyr</title>
+    <style>
+      :root { --text: #1a1a1a; --muted: #555; --bg: #fff; --line: #e5e7eb; --accent: #2563eb; }
+      @media (prefers-color-scheme: dark) {
+        :root { --text: #e5e7eb; --muted: #9ca3af; --bg: #111; --line: #333; --accent: #60a5fa; }
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 16px/1.7 system-ui, -apple-system, sans-serif; color: var(--text); background: var(--bg); padding: 0 20px; }
+      main { max-width: 680px; margin: 48px auto 80px; }
+      h1 { font-size: 28px; letter-spacing: -0.02em; margin-bottom: 4px; }
+      .updated { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+      h2 { font-size: 20px; margin: 36px 0 12px; }
+      h3 { font-size: 17px; margin: 28px 0 10px; }
+      p, li { margin-bottom: 12px; }
+      ul { padding-left: 20px; }
+      table { width: 100%; border-collapse: collapse; margin: 16px 0 20px; font-size: 14px; }
+      th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); }
+      th { font-weight: 600; white-space: nowrap; }
+      code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; background: color-mix(in srgb, var(--text) 8%, transparent); padding: 1px 5px; border-radius: 3px; }
+      strong { font-weight: 600; }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .back { display: inline-block; margin-bottom: 20px; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="https://github.com/harsha-codetech/applyr">&larr; Back to applyr</a>
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: 19 September 2026</p>
+
+      <h2>The short version</h2>
+      <p>
+        applyr does not transmit your data anywhere. There is no account, no server, no
+        analytics, and no third-party service. Everything the extension knows is stored
+        in your own browser profile and is readable only by the extension.
+      </p>
+
+      <h2>What is stored, and where</h2>
+      <table>
+        <thead>
+          <tr><th>Data</th><th>Where</th><th>Why</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Profile fields (name, contact, links, address, work history, education)</td><td><code>chrome.storage.local</code></td><td>To fill application forms</td></tr>
+          <tr><td>R&eacute;sum&eacute;s, cover letters, other documents</td><td>IndexedDB (<code>applyr</code> database)</td><td>To attach to file upload fields</td></tr>
+          <tr><td>Saved answers to screening questions</td><td><code>chrome.storage.local</code></td><td>To recall the answer next time</td></tr>
+          <tr><td>Application log (company, role, URL, status, date)</td><td><code>chrome.storage.local</code></td><td>The tracker</td></tr>
+          <tr><td>Per-site fill statistics (counts only, no field contents)</td><td><code>chrome.storage.local</code></td><td>The coverage report in Settings</td></tr>
+          <tr><td>Per-tab scan results</td><td><code>chrome.storage.session</code></td><td>Cleared when the tab closes</td></tr>
+        </tbody>
+      </table>
+      <p>All of it stays on the device. None of it is synced between machines.</p>
+
+      <h2>What is not collected</h2>
+      <ul>
+        <li>No usage analytics, crash reports or telemetry</li>
+        <li>No browsing history; the extension only reads the page you ask it to fill</li>
+        <li>No advertising identifiers, no fingerprinting, no tracking of any kind</li>
+        <li>No data about the employers or postings beyond what you see in the tracker</li>
+      </ul>
+
+      <h2>Network activity</h2>
+      <p>
+        <strong>By default the extension makes no outbound network requests at all.</strong>
+        Its selector packs are bundled files loaded from inside the extension.
+      </p>
+      <p>
+        There is exactly one feature that can change that, and it is off until you turn it on.
+      </p>
+
+      <h3>Selector pack updates (optional, off by default)</h3>
+      <p>
+        Applicant-tracking systems redesign their forms without notice. When they do,
+        the CSS selectors applyr uses stop matching and it silently stops filling that
+        site. <strong>Pack updates</strong> let applyr refresh those selectors from a
+        static JSON file instead of waiting for a Chrome Web Store review.
+      </p>
+      <p>When you enable it in <strong>Settings &rarr; Selector packs</strong>:</p>
+      <ul>
+        <li>applyr requests a separate permission for the pack source. Decline it and the feature stays off.</li>
+        <li>It performs a plain <code>GET</code> for one static JSON file, at most once every 12 hours and whenever you press <em>Check now</em>.</li>
+        <li>The request is sent with <code>credentials: 'omit'</code>. It carries <strong>no identifier, no cookies, no profile data, no r&eacute;sum&eacute;, no application history, and no query parameters</strong>. The only thing the server can observe is that some browser at your IP address asked for a public file.</li>
+        <li>What comes back is <strong>data, never code</strong>: CSS selector strings, parsed as JSON. Nothing fetched is executed, imported, or inserted into any page.</li>
+        <li>Everything fetched is validated before it is used. A bundle is rejected whole if any pack references a field the extension does not know, points a selector at a password input, routes a document upload at something that is not an upload, claims a host another pack already owns, or uses a wildcard host. A rejected bundle changes nothing and the packs that shipped with the extension keep working.</li>
+        <li>A remote pack can replace or add a pack. It can never remove one, so a source that disappears or goes wrong degrades to what shipped in the store.</li>
+      </ul>
+      <p>
+        You can point it at a different URL, press <em>Use bundled only</em> to discard
+        everything fetched, or turn it off &mdash; at which point applyr stops making
+        network requests entirely again.
+      </p>
+      <p>
+        The default source is a static file published alongside the extension&rsquo;s
+        source code, so you can read exactly what it would fetch before enabling anything.
+      </p>
+
+      <h2>Page access</h2>
+      <p>
+        applyr runs on job-application pages. The manifest lists the applicant-tracking
+        systems it supports. Any other site requires you to grant access explicitly,
+        per-site, from the side panel; you can revoke it at any time from Chrome&rsquo;s
+        extension settings.
+      </p>
+      <p>
+        On a page it runs on, the extension reads form fields and their labels in order
+        to match them to your profile, and writes the values you have saved. It does not
+        read or store the rest of the page.
+      </p>
+
+      <h2>Demographic and protected data</h2>
+      <p>
+        Gender, race and ethnicity, veteran status, disability status and date of birth
+        are treated as a separate category:
+      </p>
+      <ul>
+        <li>They are <strong>never filled by default.</strong> Filling them requires turning on &ldquo;Fill demographic fields&rdquo; in Settings.</li>
+        <li>They are <strong>never inferred or guessed.</strong> Only values you typed yourself are ever used.</li>
+        <li>They are stored on your device like every other field and are never transmitted.</li>
+      </ul>
+      <p>
+        Leaving them blank means applyr will always skip those questions and you answer
+        them yourself, or not at all.
+      </p>
+
+      <h2>Submission</h2>
+      <p>
+        applyr never submits a form. It fills fields and reports what it did; you review
+        and submit. The extension detects that <em>you</em> submitted in order to update
+        the tracker &mdash; it does not perform the submission.
+      </p>
+
+      <h2>Your control</h2>
+      <ul>
+        <li><strong>Export</strong> &mdash; Settings &rarr; <em>Export everything</em> produces a JSON file containing your profile, answers, tracker and documents.</li>
+        <li><strong>Import</strong> &mdash; restores from that file.</li>
+        <li><strong>Erase</strong> &mdash; Settings &rarr; <em>Erase all data</em> permanently clears storage and the document vault.</li>
+        <li><strong>Uninstall</strong> &mdash; removing the extension deletes all of its storage.</li>
+      </ul>
+      <p>Because there is no server copy, an export is your only backup.</p>
+
+      <h2>Children</h2>
+      <p>applyr is not directed at children and collects nothing from anyone directly.</p>
+
+      <h2>Contact</h2>
+      <p>Open an issue on the <a href="https://github.com/harsha-codetech/applyr">project repository</a>.</p>
+    </main>
+  </body>
+</html>
