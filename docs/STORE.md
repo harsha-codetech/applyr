@@ -7,8 +7,8 @@ Everything the listing form asks for. Build the upload with `npm run zip`.
 **Name** — applyr — job application autofill
 
 **Short description** (132 max)
-> Fill job applications from one profile. Works on Lever, Greenhouse, Ashby and
-> most other career sites. 100% on-device.
+> Fill job applications from one profile. 11 ATS packs, generic mode for the
+> rest, job-board ranking. 100% on-device.
 
 **Category** — Workflow & Planning
 
@@ -26,8 +26,11 @@ the extension does anything else.
 > applyr fills job applications from one profile you control, so a six-minute
 > form takes about thirty seconds.
 >
-> • Works out of the box on Lever, Greenhouse and Ashby, and falls back to
->   generic matching on almost any other career site.
+> • Works out of the box on Lever, Greenhouse, Ashby, Workable, SmartRecruiters,
+>   Pinpoint, JazzHR, Recruitee, BambooHR, Workday and iCIMS — and falls back
+>   to generic matching on almost any other career site.
+> • On Naukri, ranks the job cards you're browsing against your profile — skills,
+>   experience, location, title — so the best matches float to the top.
 > • Remembers your answers to screening questions and recalls them when another
 >   employer asks the same thing in different words.
 > • Attaches your résumé to file-upload fields.
@@ -61,6 +64,7 @@ the extension does anything else.
 | `scripting` | Registers the content script on sites the user has explicitly granted access to at runtime. |
 | `tabs` | Reads the active tab's URL so the panel can show whether applyr is running on that page and offer per-site access. |
 | Host permissions (listed ATS domains) | The content script must read form fields and their labels on application pages in order to fill them. Each listed domain is an applicant-tracking system that hosts job applications. |
+| `*://*.icims.com/*` | iCIMS embeds its application form inside an iframe on the employer's career page. The content script runs in all frames so it can reach the form inside the iframe. |
 | `*://*.naukri.com/*` | Assisted mode reads the job cards already rendered on a search page the user opened, so the side panel can rank them against the user's profile. It is read-only: no navigation, no requests, no form submission on that domain. |
 | `https://raw.githubusercontent.com/*` (optional) | Not granted at install. Requested only if the user turns on selector-pack updates, which fetch one static JSON file of CSS selectors so a broken ATS selector can be fixed without a store review. The request sends no user data and omits credentials. |
 | `*://*/*` (optional) | Not granted at install. Requested per-site, from a user click in the panel, only when the user wants applyr on a career site not covered above. |

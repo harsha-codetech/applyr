@@ -6,7 +6,7 @@ comboboxes, shadow roots, uploads. That is what the fixtures are for.
 
 ```bash
 npm run serve     # http://localhost:5173/fixtures/
-npm run e2e       # automated: installs into real Chrome and drives 23 checks
+npm run e2e       # automated: installs into real Chrome and drives 48 checks
 ```
 
 Run `npm run e2e` first — it covers most of this list automatically. What follows
@@ -73,6 +73,27 @@ history entry, one education entry, and a résumé PDF under **Documents**.
 
 On the real Naukri, confirm the same and confirm applyr never changes the page,
 never advances pagination, and never opens a posting you did not click.
+
+## 4b2. `workday-like.html` — wizard and credential gate
+
+- [ ] Panel shows **Workday pack**, step 1 of 6
+- [ ] The account gate (email + password) is **not** treated as an application
+- [ ] Filling is refused: both fields stay empty
+- [ ] Click **Continue** to advance to the form step
+- [ ] Panel field count rises; fill runs and covers first/last name, city, postal
+      code, phone, country dropdown, and the split date (month/day/year)
+- [ ] The split date fills across all three boxes correctly
+
+## 4c. `icims-like.html` — iframe-embedded form
+
+- [ ] Panel shows **iCIMS pack** and reports 2 fields from the child frame
+- [ ] Email fills inside the iframe (the outer page has nothing to fill)
+- [ ] Consent checkbox is ticked (only if `privacy_consent` is set to yes)
+- [ ] The hCaptcha textarea is **not** filled — inspect it: must be empty
+- [ ] The wrapper frame does not overwrite the child frame's tab state
+- [ ] On the real iCIMS (globalcareers-customer0.icims.com/jobs/6460/login):
+      the email field and consent checkbox are reached inside the iframe and
+      the hCaptcha is left alone
 
 ## 5. Cross-cutting
 

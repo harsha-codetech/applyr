@@ -22,8 +22,9 @@ No `npm install`, no build — the source is what runs.
 npm run serve
 ```
 
-Four fixtures at **http://localhost:5173/fixtures/** — offline stand-ins for
-Lever, Greenhouse, an unknown legacy ATS, and a deliberately hostile page.
+Seven fixtures at **http://localhost:5173/fixtures/** — offline stand-ins for
+Lever, Greenhouse, Workday, iCIMS, Naukri, an unknown legacy ATS, and a
+deliberately hostile page.
 
 ## 3. Load the demo profile
 

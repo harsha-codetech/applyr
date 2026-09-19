@@ -35,10 +35,10 @@ For a guided walkthrough with sample data, see [docs/DEMO.md](docs/DEMO.md).
 
 ## What works where
 
-**Bundled selector packs** (near-total coverage). Nine of the ten have been
+**Bundled selector packs** (near-total coverage). Nine of the eleven have been
 checked against a real application form, with their selectors resolved read-only
-in the browser — no values were ever written to a live employer form. Workday is
-the exception, and says so:
+in the browser — no values were ever written to a live employer form. Workday and
+iCIMS are partial exceptions, and say so:
 
 | Pack | Checked against |
 |---|---|
@@ -52,6 +52,7 @@ the exception, and says so:
 | Recruitee | live posting, 18 Sep 2026 |
 | BambooHR | live posting, 18 Sep 2026 |
 | Workday | **shell only** — apply flow verified live, form steps are account-gated |
+| iCIMS | **email step only** — iframe, email field, consent and hCaptcha verified live; form steps are account-gated |
 
 Each pack carries a `verifiedAgainstLiveForm` date, enforced by a test, so a
 pack written from guesswork cannot quietly pass as a checked one. ATSs redesign;
@@ -62,15 +63,17 @@ falls back to `autocomplete` tokens, name/id patterns and visible label text, so
 an unknown ATS still fills most of the form. Verified against the legacy-style
 fixture at 92%.
 
-Manifest-declared hosts also include Teamtailor, Breezy and iCIMS — those run in
+Manifest-declared hosts also include Teamtailor and Breezy — those run in
 generic mode until a pack is written for them.
 
-**Workday is the honest exception.** Its public apply flow was verified live, but
-Workday puts step 1 of 6 behind mandatory account creation, so the form steps
-themselves have never been seen by this code. Those selectors follow Workday’s
-documented conventions and are exercised against a fixture, but expect to correct
-some of them on your first real application. The pack records this as
-`verifiedAgainstLiveForm: null`.
+**Workday and iCIMS are the honest exceptions.** Workday’s public apply flow was
+verified live, but step 1 of 6 is mandatory account creation, so the form steps
+themselves have never been seen by this code. iCIMS embeds its entire form inside
+an iframe; the email-plus-consent first step is verified live, but the rest is
+behind account creation. Both packs follow their platform’s documented naming
+conventions and are exercised against fixtures, but expect to correct some
+selectors on a first real application. Generic mode fills the account-gated steps
+in the meantime — both ATSs label their fields properly.
 
 applyr also refuses outright to fill any page containing a password field, which
 is what Workday’s step 1 is.
@@ -97,7 +100,7 @@ reorder what is in front of you. It never decides anything.
 ## Develop
 
 ```bash
-npm test          # 77 engine tests, no dependencies
+npm test          # engine tests, no dependencies
 npm run serve     # fixtures at http://localhost:5173/fixtures/
 npm run e2e       # loads the extension into real Chrome and drives it over CDP
 npm run packs:bundle  # regenerate packs.json for remote pack updates
@@ -195,11 +198,12 @@ tests/                 node:test engine suite
 
 ## Status
 
-v1 is complete and verified in a real Chrome: engine, generic mode, ten packs,
-assisted mode, question memory, document vault, tracker, optional remote pack
-updates, and a Web Store package. 77 unit tests and 45 end-to-end checks pass.
+v1 is complete and verified in a real Chrome: engine, generic mode, eleven packs
+(including iframe-embedded iCIMS), assisted mode, question memory, document
+vault, tracker, optional remote pack updates, and a Web Store package. 77 unit
+tests and 48 end-to-end checks pass.
 
-What has not happened yet: a real application submitted through it. Workday's
-form steps in particular have never been seen by this code. See
-[docs/PLAN.md](docs/PLAN.md) for what is left, and
+What has not happened yet: a real application submitted through it. Workday's and
+iCIMS's form steps in particular are only partially verified against live tenants.
+See [docs/PLAN.md](docs/PLAN.md) for the full history, and
 [tests/MANUAL.md](tests/MANUAL.md) for the checks a person still has to make.

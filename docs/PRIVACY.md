@@ -1,6 +1,6 @@
 # Privacy policy — applyr
 
-_Last updated: 18 September 2026_
+_Last updated: 19 September 2026_
 
 ## The short version
 

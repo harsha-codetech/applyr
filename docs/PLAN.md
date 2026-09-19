@@ -206,49 +206,64 @@ Country and Highest Education selects are `tabindex="-1"` because they sit
 behind custom widgets, and Greenhouse marks its combobox inner inputs the same
 way. It was dropped, with a test pinning the decision.
 
-## v1.1 — in progress
+## iCIMS — done
 
-- **Wave-2 packs — done for four of six.** Workable, SmartRecruiters, Pinpoint
+The first of the legacy enterprise ATSs, and the one that required real engine
+changes rather than just a selector file.
+
+Verified against globalcareers-customer0.icims.com on 19 Sep 2026: the iframe
+wrapper (`#icims_content_iframe`), the email step (`css_loginName`,
+`accept_privacy`, `#enterEmailSubmitButton`) and the hCaptcha textarea are all
+confirmed live. The post-login form fields follow iCIMS's `css_*` naming
+convention but are not verifiable without an account.
+
+### Engine work this required
+
+- **Frame priority in the service worker.** On iframe-embedded forms the wrapper
+  page (0 fields) would report after the child frame (the actual form), erasing
+  the child's report. The frame that found the most fields now keeps the tab
+  state, which also fixes a latent bug in iframe-embedded Greenhouse forms.
+- **Pack-matched detection bypass.** `looksLikeApplication()` required ≥ 3
+  fields. iCIMS's email step has only 2 visible fields (email + consent). When a
+  site pack claimed the page, a `packMatched` option now bypasses the field-count
+  check — password fields still outrank.
+- **Fixture with iframe.** `icims-like.html` wraps `icims-inner.html` in an
+  `#icims_content_iframe`, exercised by the e2e.
+
+## v1.1 — done
+
+- **Wave-2 packs — complete.** Workable, SmartRecruiters, Pinpoint
   and JazzHR were each written against a live application form and their
-  selectors verified read-only in the browser on 18 Sep 2026.
-  - *Recruitee* and *BambooHR* are deferred: every company board reachable at
-    the time redirected to the vendor marketing site, so no live form could be
-    inspected. Rather than ship guessed selectors they stay in generic mode.
-    Revisit when a live board is available.
+  selectors verified read-only in the browser on 18 Sep 2026. Recruitee and
+  BambooHR were later verified live and added with the honeypot fix.
   - Each pack now carries `verifiedAgainstLiveForm`, enforced by a test, so
-    fixture-only packs (Lever, Greenhouse, Ashby) are visibly distinguished from
-    live-verified ones.
+    fixture-only packs are visibly distinguished from live-verified ones.
   - Note on SmartRecruiters: its apply flow is a wizard of `<spl-button>` custom
     elements with no real submit button, and the only `button[type=submit]` on
     the page is the cookie-settings control. Its `submit` list is therefore
     deliberately empty so the tracker cannot log a false submission; detection
     falls back to the confirmation-screen heuristic.
+
+## v2 — done
+
+- **Workday** — done. Multi-step wizard, split-date fields, credential-screen
+  refusal. Shell verified live; form steps are account-gated and exercised
+  against fixtures.
+- **Naukri assisted mode** — done. Read-only scoring of job cards against the
+  profile. No navigation, no applying through the board.
+- **Remote selector packs** — done. Off by default, validated before use, hostile
+  bundles refused. `npm run packs:bundle` regenerates `packs.json`.
+- **iCIMS** — done. Iframe-embedded forms, frame priority, pack-matched
+  detection bypass. Email step verified live; form steps are account-gated.
+
+## Future
+
+- **Taleo, SuccessFactors, Avature** — legacy enterprise ATSs. Generic mode
+  already gets partial fill. Add packs when a live form can be inspected.
 - **Fixture capture command** — snapshot a live page into `fixtures/` so a pack
   can be written against a real DOM offline.
 - **Résumé-per-application** — pick which document goes with which posting
   rather than always using the default.
-
-## v2
-
-- **Workday** (4–6d). Its own phase: multi-step wizard state machine keyed on
-  `data-automation-id`, per-employer accounts, tenant selector drift. Expect
-  ~70% coverage and ongoing maintenance. The MutationObserver rescan built in
-  Phase 2 is the foundation; hard-mode.html already exercises it.
-- **Naukri assisted mode** (3d). Read-only: parse the listings you are already
-  browsing, score against the profile, surface matches in the panel, one-click
-  open and fill. No automated submission, no background crawling, no velocity
-  beyond your own browsing.
-- **Remote selector packs** (2d). Fetch `index.json` and the packs from a static
-  URL with the bundled copy as fallback, so a selector break is a one-hour fix
-  instead of a store-review cycle. Legal under MV3 because packs are data, not
-  code — the format was designed for this from day one. Needs no backend: a
-  static file on any CDN.
-
-## v2.1+
-
-- **Legacy enterprise**: iCIMS, Taleo, SuccessFactors, Avature (2–3d each).
-  Deliberately last — the most work per point of coverage, and generic mode
-  already gets partial fill there.
 
 ## Explicitly out of scope
 

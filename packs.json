@@ -1,7 +1,7 @@
 {
   "format": "applyr-packs",
   "version": 1,
-  "updated": "2026-09-18",
+  "updated": "2026-09-19",
   "minExtensionVersion": "1.0.0",
   "packs": [
     {
@@ -1419,20 +1419,21 @@
       "match": [
         "icims.com"
       ],
-      "verifiedAgainstLiveForm": null,
+      "verifiedAgainstLiveForm": "2026-09-19",
       "notes": [
-        "PARTIALLY VERIFIED, and the unverified part is most of the form.",
+        "PARTIALLY VERIFIED: the email step is confirmed live, the rest is convention.",
         "",
-        "Confirmed against a live iCIMS tenant on 19 Sep 2026:",
+        "Verified against globalcareers-customer0.icims.com on 19 Sep 2026:",
         "  - The entire application renders inside <iframe id='icims_content_iframe'>,",
         "    pointing at the same host with ?in_iframe=1. applyr only reaches it because",
         "    the manifest sets all_frames; without that there is nothing to fill.",
         "  - The application opens on a two-field step titled 'Enter Your Information':",
         "    input[name='css_loginName'] (email) and input[name='accept_privacy'] (consent),",
-        "    submitted with #enterEmailSubmitButton. Those two selectors are real.",
+        "    submitted with #enterEmailSubmitButton. All three selectors confirmed live.",
         "  - The page carries an hCaptcha, rendered as a real <textarea> named",
         "    h-captcha-response. The detector ignores captcha controls, so it is never",
         "    filled - see isIgnored() in content/detector.js.",
+        "  - meta[property='og:site_name'] resolves for the company name.",
         "  - Form fields use a css_ prefix. That convention is confirmed; the individual",
         "    names below are NOT.",
         "",
